@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Aceptar Invitación"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <EditText
+        android:id="@+id/etToken"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Pega el código UUID aquí"
+        android:textAlignment="center"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnAceptar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vincular Empresa"
+        android:minHeight="80dp"
+        android:textSize="18sp"
+        android:textAllCaps="false"/>
+
+    <Button
+        android:id="@+id/btnVolverEmpresas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volver"
+        android:layout_marginTop="8dp"
+        android:minHeight="80dp"
+        android:textSize="18sp"
+        android:textAllCaps="false"
+        style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+</LinearLayout>
