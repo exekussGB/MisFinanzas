@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvFormTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Datos de la Empresa"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText android:id="@+id/etRazonSocial" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Razón Social" />
+        <EditText android:id="@+id/etRut" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="RUT Empresa" />
+        <EditText android:id="@+id/etGiro" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Giro" />
+        <EditText android:id="@+id/etTipoEmpresa" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Tipo (SpA, EIRL, etc)" />
+        <EditText android:id="@+id/etFechaInicio" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Inicio Actividades (YYYY-MM-DD)" android:inputType="date" />
+        <EditText android:id="@+id/etDireccion" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Dirección Comercial" />
+        <EditText android:id="@+id/etComuna" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Comuna" />
+        <EditText android:id="@+id/etRegion" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Región" />
+        <EditText android:id="@+id/etCorreo" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Correo Contacto" android:inputType="textEmailAddress" />
+        <EditText android:id="@+id/etTelefono" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Teléfono Contacto" android:inputType="phone" />
+
+        <Button
+            android:id="@+id/btnGuardar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Guardar Empresa"
+            android:layout_marginTop="24dp"
+            android:minHeight="80dp"
+            android:textSize="18sp"
+            android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_marginTop="8dp"
+            android:minHeight="80dp"
+            android:textSize="18sp"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+</ScrollView>

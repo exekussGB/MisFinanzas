@@ -3,7 +3,6 @@ package com.analistainacap.misfinanzas
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -25,17 +24,17 @@ class EmpresasActivity : AppCompatActivity() {
         
         loadEmpresas()
 
-        // Vincular con código
+        // Botón "Registrar Nueva Empresa"
+        binding.btnCrearEmpresa.setOnClickListener {
+            val intent = Intent(this, EmpresaFormActivity::class.java)
+            startActivityForResult(intent, 100)
+        }
+
+        // Otros botones existentes
         binding.btnTengoCodigo.setOnClickListener {
             startActivity(Intent(this, AceptarInvitacionActivity::class.java))
         }
 
-        // Crear nueva empresa
-        binding.btnCrearEmpresa.setOnClickListener {
-            startActivity(Intent(this, CrearEmpresaActivity::class.java))
-        }
-
-        // Botón Volver (Cerrar Sesión)
         binding.btnVolverLogin.setOnClickListener {
             forceLogout()
         }
@@ -43,75 +42,68 @@ class EmpresasActivity : AppCompatActivity() {
 
     private fun loadEmpresas() {
         binding.pbLoading.visibility = View.VISIBLE
+        binding.containerEmpresas.removeAllViews()
 
-        RetrofitClient.getApi(this).getEmpresasConRol().enqueue(object : Callback<List<EmpresaRolDTO>> {
+        // Consumimos la vista segura de empresas del usuario
+        RetrofitClient.getApi(this).getEmpresas().enqueue(object : Callback<List<EmpresaDTO>> {
             override fun onResponse(
-                call: Call<List<EmpresaRolDTO>>,
-                response: Response<List<EmpresaRolDTO>>
+                call: Call<List<EmpresaDTO>>,
+                response: Response<List<EmpresaDTO>>
             ) {
                 binding.pbLoading.visibility = View.GONE
-                if (!response.isSuccessful) {
+                if (response.isSuccessful) {
+                    val empresas = response.body() ?: emptyList()
+                    renderEmpresas(empresas)
+                } else if (response.code() == 401) {
                     forceLogout()
-                    return
+                } else {
+                    showError("Error al cargar lista: ${response.code()}")
                 }
-
-                val empresas = response.body() ?: return
-                renderEmpresas(empresas)
             }
 
-            override fun onFailure(call: Call<List<EmpresaRolDTO>>, t: Throwable) {
+            override fun onFailure(call: Call<List<EmpresaDTO>>, t: Throwable) {
                 binding.pbLoading.visibility = View.GONE
                 showError("Sin conexión a internet")
             }
         })
     }
 
-    private fun renderEmpresas(empresas: List<EmpresaRolDTO>) {
-        binding.containerEmpresas.removeAllViews()
-
+    private fun renderEmpresas(empresas: List<EmpresaDTO>) {
         if (empresas.isEmpty()) {
-            showError("No se encontraron empresas")
+            Toast.makeText(this, "No tienes empresas vinculadas", Toast.LENGTH_SHORT).show()
             return
         }
 
         empresas.forEach { empresa ->
             val button = Button(this).apply {
-                text = "${empresa.empresa_nombre}\n(${empresa.rol})"
+                text = "${empresa.razonSocial}\n(RUT: ${empresa.rutEmpresa})"
                 isAllCaps = false
-                // Aumentar el tamaño del botón
-                minHeight = dpToPx(80)
+                minHeight = (80 * resources.displayMetrics.density).toInt()
                 textSize = 18f
                 
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    setMargins(0, dpToPx(8), 0, dpToPx(8))
-                }
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(0, 8, 0, 8)
+                layoutParams = params
 
                 setOnClickListener {
-                    saveEmpresaContext(empresa)
-                    openDashboard()
+                    // Al pulsar, vamos al DETALLE para ver opciones de Dashboard, Editar o Borrar
+                    val intent = Intent(this@EmpresasActivity, EmpresaDetalleActivity::class.java)
+                    intent.putExtra("EXTRA_EMPRESA", empresa)
+                    startActivity(intent)
                 }
             }
             binding.containerEmpresas.addView(button)
         }
     }
 
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
-    }
-
-    private fun saveEmpresaContext(empresa: EmpresaRolDTO) {
-        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-        prefs.edit()
-            .putString("empresa_id", empresa.empresa_id)
-            .putString("empresa_rol", empresa.rol)
-            .apply()
-    }
-
-    private fun openDashboard() {
-        startActivity(Intent(this, MainActivity::class.java))
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            loadEmpresas() // Recargar lista si hubo cambios
+        }
     }
 
     private fun forceLogout() {

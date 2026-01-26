@@ -9,10 +9,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-/**
- * Actividad para registrar una nueva empresa en el sistema.
- * Consume la función RPC 'crear_empresa' de Supabase.
- */
 class CrearEmpresaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,9 +16,14 @@ class CrearEmpresaActivity : AppCompatActivity() {
         setContentView(R.layout.activity_crear_empresa)
 
         val btnCrear = findViewById<Button>(R.id.btnCrearEmpresa)
+        val btnVolver = findViewById<Button>(R.id.btnVolverEmpresas)
 
         btnCrear.setOnClickListener {
             ejecutarCreacion()
+        }
+
+        btnVolver.setOnClickListener {
+            finish()
         }
     }
 
@@ -49,24 +50,25 @@ class CrearEmpresaActivity : AppCompatActivity() {
         }
 
         // --- 3. Preparación del Request ---
+        // Sincronizado con los nombres exactos del backend para evitar Error 400
         val request = CreateEmpresaRequest(
             razon_social = razonSocial,
             rut_empresa = rut,
             giro = giro,
             tipo_empresa = tipo,
-            fecha_inicio_actividades = if (fecha.isEmpty()) "2000-01-01" else fecha, // Default por seguridad
-            direccion = direccion,
+            fecha_inicio_actividades = if (fecha.isEmpty()) "2000-01-01" else fecha,
+            direccion_comercial = direccion,
             comuna = comuna,
             region = region,
-            correo = correo,
-            telefono = telefono,
+            correo_contacto = correo,
+            telefono_contacto = telefono,
             representante_legal = representante,
             regimen_tributario = regimen,
             afecta_iva = afectaIva
         )
 
         // --- 4. Llamada al endpoint vía Retrofit Enqueue ---
-        RetrofitClient.getApi(this).crearEmpresa(request)
+        RetrofitClient.getApi(this).crearEmpresaRpc(request)
             .enqueue(object : Callback<String> {
                 override fun onResponse(call: Call<String>, response: Response<String>) {
                     if (response.isSuccessful && response.body() != null) {
@@ -77,12 +79,14 @@ class CrearEmpresaActivity : AppCompatActivity() {
                         
                         Toast.makeText(this@CrearEmpresaActivity, "Empresa creada correctamente", Toast.LENGTH_SHORT).show()
                         
-                        // Navegar al Dashboard
-                        val intent = Intent(this@CrearEmpresaActivity, MainActivity::class.java)
+                        // Navegar a la selección de empresas para ver la lista actualizada
+                        val intent = Intent(this@CrearEmpresaActivity, EmpresasActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         startActivity(intent)
                         finish()
                     } else {
-                        Toast.makeText(this@CrearEmpresaActivity, "Error al crear: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        // El código 400 suele ser por nombres de parámetros mal escritos en SQL vs Kotlin
+                        Toast.makeText(this@CrearEmpresaActivity, "Error ${response.code()}: Revisa los datos o permisos", Toast.LENGTH_LONG).show()
                     }
                 }
 

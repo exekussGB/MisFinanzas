@@ -2,38 +2,134 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp">
 
     <TextView
-        android:id="@+id/tvStatus"
+        android:id="@+id/tvEmpresaNombre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cargando datos..."
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:layout_marginBottom="24dp"/>
+        android:text="Nombre Empresa"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"
+        android:textAlignment="center"/>
+
+    <!-- CARD SALDO REAL -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_card"
+        android:padding="20dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/primary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Saldo Real Actual"
+            android:textColor="@color/white"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/tvSaldoReal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$0.00"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- INGRESOS Y GASTOS -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ingresos"
+                android:textColor="@color/success"
+                android:textSize="12sp"/>
+            <TextView
+                android:id="@+id/tvTotalIngresos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$0.00"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gastos"
+                android:textColor="@color/error"
+                android:textSize="12sp"/>
+            <TextView
+                android:id="@+id/tvTotalGastos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$0.00"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Últimos Movimientos"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- LISTA DE MOVIMIENTOS -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMovimientos"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp"/>
 
     <Button
         android:id="@+id/btnInvitarUsuario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Invitar Usuario"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:visibility="gone"
-        android:minHeight="80dp"
-        android:textSize="18sp"
+        android:minHeight="60dp"
+        android:textSize="16sp"
         android:textAllCaps="false"/>
 
     <Button
         android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Cerrar Sesión"
-        android:minHeight="80dp"
-        android:textSize="18sp"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:minHeight="60dp"
+        android:textSize="16sp"
         android:textAllCaps="false"/>
 
 </LinearLayout>
