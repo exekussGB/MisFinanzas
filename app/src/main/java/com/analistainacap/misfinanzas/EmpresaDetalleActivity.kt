@@ -17,6 +17,9 @@ class EmpresaDetalleActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEmpresaDetalleBinding
     private var empresa: EmpresaDTO? = null
 
+    // Clave para SharedPreferences (persistencia de sesión)
+    private val KEY_EMPRESA_ID_PREFS = "empresa_id_activa"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEmpresaDetalleBinding.inflate(layoutInflater)
@@ -31,17 +34,24 @@ class EmpresaDetalleActivity : AppCompatActivity() {
 
         mostrarDatos()
 
-        // IR AL DASHBOARD FINANCIERO
+        // IR AL DASHBOARD FINANCIERO (C1)
         binding.btnVerDashboard.setOnClickListener {
-            // Guardamos el contexto de la empresa actual para que el dashboard sepa cuál mostrar
-            val prefs = getSharedPreferences("auth", Context.MODE_PRIVATE)
-            prefs.edit()
-                .putString("empresa_id", empresa?.id)
-                .putString("empresa_nombre", empresa?.razonSocial)
-                .apply()
+            if (empresa?.id != null) {
+                // 1. Guardar en SharedPreferences para persistencia global
+                val prefs = getSharedPreferences("auth", Context.MODE_PRIVATE)
+                prefs.edit()
+                    .putString(KEY_EMPRESA_ID_PREFS, empresa?.id)
+                    .putString("empresa_nombre", empresa?.razonSocial)
+                    .apply()
 
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+                // 2. Envío EXPLÍCITO por Intent (Requerimiento C8/C9)
+                // Usando la clave consistente "empresa_id"
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("empresa_id", empresa?.id)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Error: ID de empresa no encontrado", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.btnEditar.setOnClickListener {
@@ -81,8 +91,9 @@ class EmpresaDetalleActivity : AppCompatActivity() {
         if (empresa?.id == null) return
 
         val update = empresa!!.copy(activa = false, estadoEmpresa = "eliminada")
+        val filters = mapOf("id" to "eq.${empresa!!.id}")
         
-        RetrofitClient.getApi(this).editarEmpresa("eq.${empresa!!.id}", update)
+        RetrofitClient.getApi(this).editarEmpresa(filters, update)
             .enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {

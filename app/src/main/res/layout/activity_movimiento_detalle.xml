@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <ScrollView
+        android:id="@+id/scrollDetalle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ficha de Movimiento"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="20dp"
+                android:textColor="@color/primary"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:stretchColumns="1">
+
+                    <!-- GLOSA -->
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="Descripción:" android:textStyle="bold" android:textSize="14sp" android:layout_marginEnd="16dp"/>
+                        <TextView android:id="@+id/tvDetalleGlosa" android:textSize="14sp" android:gravity="end"/>
+                    </TableRow>
+
+                    <View android:layout_height="1dp" android:background="#EEEEEE"/>
+
+                    <!-- MONTO TOTAL -->
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="Monto Total:" android:textStyle="bold" android:textSize="14sp"/>
+                        <TextView android:id="@+id/tvDetalleMonto" android:textSize="16sp" android:textStyle="bold" android:gravity="end"/>
+                    </TableRow>
+
+                    <View android:layout_height="1dp" android:background="#EEEEEE"/>
+
+                    <!-- NETO E IVA -->
+                    <TableRow android:id="@+id/rowNeto" android:paddingVertical="8dp">
+                        <TextView android:text="Monto Neto:" android:textSize="14sp"/>
+                        <TextView android:id="@+id/tvDetalleMontoNeto" android:textSize="14sp" android:gravity="end"/>
+                    </TableRow>
+
+                    <TableRow android:id="@+id/rowIva" android:paddingVertical="8dp">
+                        <TextView android:text="IVA:" android:textSize="14sp"/>
+                        <TextView android:id="@+id/tvDetalleMontoIva" android:textSize="14sp" android:gravity="end"/>
+                    </TableRow>
+
+                    <View android:layout_height="1dp" android:background="#EEEEEE"/>
+
+                    <!-- FECHA -->
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="Fecha:" android:textStyle="bold" android:textSize="14sp"/>
+                        <TextView android:id="@+id/tvDetalleFecha" android:textSize="14sp" android:gravity="end"/>
+                    </TableRow>
+
+                    <View android:layout_height="1dp" android:background="#EEEEEE"/>
+
+                    <!-- CATEGORIA -->
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="Categoría:" android:textStyle="bold" android:textSize="14sp"/>
+                        <TextView android:id="@+id/tvDetalleCategoria" android:textSize="14sp" android:gravity="end"/>
+                    </TableRow>
+
+                    <View android:layout_height="1dp" android:background="#EEEEEE"/>
+
+                    <!-- FORMA DE PAGO -->
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="Cuenta:" android:textStyle="bold" android:textSize="14sp"/>
+                        <TextView android:id="@+id/tvDetalleFormaPago" android:textSize="14sp" android:gravity="end"/>
+                    </TableRow>
+
+                    <View android:layout_height="1dp" android:background="#EEEEEE"/>
+
+                    <!-- TIPO -->
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="Tipo:" android:textStyle="bold" android:textSize="14sp"/>
+                        <TextView android:id="@+id/tvDetalleTipo" android:textSize="14sp" android:gravity="end"/>
+                    </TableRow>
+
+                </TableLayout>
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/btnVolverDetalle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cerrar Ficha"
+                android:layout_marginTop="24dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ESTADOS -->
+    <ProgressBar android:id="@+id/pbCargandoDetalle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>
+
+    <LinearLayout android:id="@+id/layoutErrorDetalle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:layout_gravity="center" android:visibility="gone">
+        <TextView android:id="@+id/tvMensajeErrorDetalle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Error al cargar" android:layout_marginBottom="16dp"/>
+        <Button android:id="@+id/btnErrorVolver" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Volver"/>
+    </LinearLayout>
+
+</FrameLayout>

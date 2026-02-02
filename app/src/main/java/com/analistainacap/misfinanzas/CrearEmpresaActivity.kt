@@ -11,6 +11,8 @@ import retrofit2.Response
 
 class CrearEmpresaActivity : AppCompatActivity() {
 
+    private val KEY_EMPRESA_ID = "empresa_id_activa"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crear_empresa)
@@ -28,7 +30,6 @@ class CrearEmpresaActivity : AppCompatActivity() {
     }
 
     private fun ejecutarCreacion() {
-        // --- 1. Captura de datos desde los inputs ---
         val razonSocial = findViewById<EditText>(R.id.etRazonSocial).text.toString().trim()
         val rut = findViewById<EditText>(R.id.etRut).text.toString().trim()
         val giro = findViewById<EditText>(R.id.etGiro).text.toString().trim()
@@ -43,63 +44,54 @@ class CrearEmpresaActivity : AppCompatActivity() {
         val regimen = findViewById<EditText>(R.id.etRegimen).text.toString().trim()
         val afectaIva = findViewById<CheckBox>(R.id.cbAfectaIva).isChecked
 
-        // --- 2. Validaciones Mínimas ---
         if (razonSocial.isEmpty() || rut.isEmpty() || giro.isEmpty()) {
             Toast.makeText(this, "Completa Razón Social, RUT y Giro", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // --- 3. Preparación del Request ---
-        // Sincronizado con los nombres exactos del backend para evitar Error 400
         val request = CreateEmpresaRequest(
-            razon_social = razonSocial,
-            rut_empresa = rut,
+            razonSocial = razonSocial,
+            rutEmpresa = rut,
             giro = giro,
-            tipo_empresa = tipo,
-            fecha_inicio_actividades = if (fecha.isEmpty()) "2000-01-01" else fecha,
-            direccion_comercial = direccion,
+            tipoEmpresa = tipo,
+            fechaInicioActividades = if (fecha.isEmpty()) "2000-01-01" else fecha,
+            direccionComercial = direccion,
             comuna = comuna,
             region = region,
-            correo_contacto = correo,
-            telefono_contacto = telefono,
-            representante_legal = representante,
-            regimen_tributario = regimen,
-            afecta_iva = afectaIva
+            correoContacto = correo,
+            telefonoContacto = telefono,
+            representanteLegal = representante,
+            regimenTributario = regimen,
+            afectaIva = afectaIva
         )
 
-        // --- 4. Llamada al endpoint vía Retrofit Enqueue ---
         RetrofitClient.getApi(this).crearEmpresaRpc(request)
             .enqueue(object : Callback<String> {
                 override fun onResponse(call: Call<String>, response: Response<String>) {
                     if (response.isSuccessful && response.body() != null) {
                         val nuevoId = response.body()!!
-                        
-                        // Guardar ID en preferencias
-                        saveEmpresaId(nuevoId)
-                        
+                        saveEmpresaId(nuevoId, razonSocial)
                         Toast.makeText(this@CrearEmpresaActivity, "Empresa creada correctamente", Toast.LENGTH_SHORT).show()
-                        
-                        // Navegar a la selección de empresas para ver la lista actualizada
-                        val intent = Intent(this@CrearEmpresaActivity, EmpresasActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        val intent = Intent(this@CrearEmpresaActivity, MainActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
                         finish()
                     } else {
-                        // El código 400 suele ser por nombres de parámetros mal escritos en SQL vs Kotlin
-                        Toast.makeText(this@CrearEmpresaActivity, "Error ${response.code()}: Revisa los datos o permisos", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@CrearEmpresaActivity, "Error ${response.code()}", Toast.LENGTH_LONG).show()
                     }
                 }
 
                 override fun onFailure(call: Call<String>, t: Throwable) {
-                    Toast.makeText(this@CrearEmpresaActivity, "Fallo de conexión: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@CrearEmpresaActivity, "Fallo de conexión", Toast.LENGTH_SHORT).show()
                 }
             })
     }
 
-    private fun saveEmpresaId(id: String) {
+    private fun saveEmpresaId(id: String, nombre: String) {
         getSharedPreferences("auth", MODE_PRIVATE)
             .edit()
-            .putString("empresa_id", id)
+            .putString(KEY_EMPRESA_ID, id)
+            .putString("empresa_nombre", nombre)
             .apply()
     }
 }

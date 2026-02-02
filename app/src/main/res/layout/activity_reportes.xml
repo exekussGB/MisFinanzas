@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#F0F2F5">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Centro de Reportes"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/primary"/>
+
+    <!-- SELECTOR DE PERIODO (C10.16) -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        android:layout_marginBottom="20dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Período de Reporte"
+                android:textSize="14sp"
+                android:textColor="#666666"/>
+
+            <TextView
+                android:id="@+id/tvPeriodoReporte"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2024-05"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:background="@drawable/rounded_card"
+                android:backgroundTint="#EEEEEE"
+                android:clickable="true"
+                android:focusable="true"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- CARD: LIBROS CONTABLES -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:text="LIBROS OFICIALES"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#888888"
+                        android:layout_marginBottom="12dp"/>
+
+                    <Button
+                        android:id="@+id/btnLibroIngresos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Libro de Ingresos"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:gravity="start|center_vertical"
+                        app:icon="@android:drawable/ic_input_add"/>
+
+                    <Button
+                        android:id="@+id/btnLibroEgresos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Libro de Egresos"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:gravity="start|center_vertical"
+                        app:icon="@android:drawable/ic_delete"/>
+
+                    <Button
+                        android:id="@+id/btnLibroDiario"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Libro Diario"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:gravity="start|center_vertical"
+                        app:icon="@android:drawable/ic_menu_today"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- CARD: REPORTES TRIBUTARIOS -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:text="REPORTES TRIBUTARIOS"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#888888"
+                        android:layout_marginBottom="12dp"/>
+
+                    <Button
+                        android:id="@+id/btnResumenIva"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Resumen IVA Mensual"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:gravity="start|center_vertical"
+                        app:icon="@android:drawable/ic_menu_agenda"/>
+
+                    <Button
+                        android:id="@+id/btnReporteCategorias"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Reporte por Categoría"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:gravity="start|center_vertical"
+                        app:icon="@android:drawable/ic_menu_sort_by_size"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/pbReportes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btnVolverDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volver al Dashboard"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+</LinearLayout>

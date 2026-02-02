@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/rounded_card"
+    android:backgroundTint="@color/white">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filtros de Auditoría"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- FILTRO ACCIÓN -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipo de Acción"
+        android:textSize="12sp"
+        android:textColor="#888888"/>
+    <Spinner
+        android:id="@+id/spinnerAccion"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- FILTRO TABLA -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tabla Afectada"
+        android:textSize="12sp"
+        android:textColor="#888888"/>
+    <Spinner
+        android:id="@+id/spinnerTabla"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- FILTRO USUARIO -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email del Usuario"
+        android:textSize="12sp"
+        android:textColor="#888888"/>
+    <EditText
+        android:id="@+id/etFiltroUsuario"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="ejemplo@correo.com"
+        android:textSize="14sp"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnAplicarFiltrosAudit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aplicar Filtros"
+        android:layout_marginBottom="8dp"/>
+
+    <Button
+        android:id="@+id/btnLimpiarFiltrosAudit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Limpiar Filtros"
+        style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+</LinearLayout>

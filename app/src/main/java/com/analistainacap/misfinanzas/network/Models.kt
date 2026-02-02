@@ -3,99 +3,129 @@ package com.analistainacap.misfinanzas.network
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-// --- Auth ---
-data class LoginRequest(val email: String, val password: String)
-data class LoginResponse(val access_token: String)
-
-// --- Empresas (Compatible con Tabla y Vistas) ---
-data class EmpresaDTO(
-    @SerializedName(value = "id", alternate = ["empresa_id"])
-    val id: String? = null,
-    
-    @SerializedName(value = "razon_social", alternate = ["empresa_nombre", "nombre"])
-    val razonSocial: String,
-    
-    @SerializedName("rut_empresa") 
-    val rutEmpresa: String,
-    
-    val giro: String,
-    
-    @SerializedName("tipo_empresa") 
-    val tipoEmpresa: String? = null,
-    
-    @SerializedName("fecha_inicio_actividades") 
-    val fechaInicio: String? = null,
-    
-    @SerializedName(value = "direccion_comercial", alternate = ["direccion"])
-    val direccionComercial: String? = null,
-    
-    val comuna: String? = null,
-    val region: String? = null,
-    
-    @SerializedName(value = "correo_contacto", alternate = ["correo"])
-    val correoContacto: String? = null,
-    
-    @SerializedName(value = "telefono_contacto", alternate = ["telefono"])
-    val telefonoContacto: String? = null,
-    
-    @SerializedName("estado_empresa") 
-    val estadoEmpresa: String? = "activa",
-    
-    val activa: Boolean? = true
+data class LoginRequest(
+    @SerializedName("email") val email: String?,
+    @SerializedName("password") val password: String?
 ) : Serializable
 
-// --- Creación de Empresa (Parámetros para RPC) ---
-data class CreateEmpresaRequest(
-    val razon_social: String,
-    val rut_empresa: String,
-    val giro: String,
-    val tipo_empresa: String,
-    val fecha_inicio_actividades: String,
-    val direccion_comercial: String,
-    val comuna: String,
-    val region: String,
-    val correo_contacto: String,
-    val telefono_contacto: String,
-    val representante_legal: String,
-    val regimen_tributario: String,
-    val afecta_iva: Boolean
-)
+data class LoginResponse(
+    @SerializedName("access_token") val accessToken: String?
+) : Serializable
 
-// --- Dashboard y Otros ---
-data class EmpresaRolDTO(
-    val empresa_id: String,
-    val empresa_nombre: String,
-    val rol: String
-)
+data class EmpresaDTO(
+    @SerializedName("id") val id: String?,
+    @SerializedName("razon_social") val razonSocial: String?,
+    @SerializedName("rut_empresa") val rutEmpresa: String?,
+    @SerializedName("giro") val giro: String?,
+    @SerializedName("tipo_empresa") val tipoEmpresa: String?,
+    @SerializedName("fecha_inicio_actividades") val fechaInicioActividades: String?,
+    @SerializedName("direccion_comercial") val direccionComercial: String?,
+    @SerializedName("comuna") val comuna: String?,
+    @SerializedName("region") val region: String?,
+    @SerializedName("correo_contacto") val correoContacto: String?,
+    @SerializedName("telefono_contacto") val telefonoContacto: String?,
+    @SerializedName("estado_empresa") val estadoEmpresa: String?,
+    @SerializedName("rol") val rol: String?,
+    @SerializedName("activa") val activa: Boolean? = true
+) : Serializable
 
-data class DashboardDTO(
-    @SerializedName("empresa_id") val empresaId: String,
-    val nombre: String,
-    @SerializedName("total_ingresos") val ingresos: Double,
-    @SerializedName("total_gastos") val gastos: Double,
-    @SerializedName("saldo_real") val saldoReal: Double
-)
+data class AuditoriaDTO(
+    @SerializedName("id") val id: String?,
+    @SerializedName("tabla_nombre") val tablaNombre: String?,
+    @SerializedName("operacion") val operacion: String?,
+    @SerializedName("usuario_email") val usuarioEmail: String?,
+    @SerializedName("fecha_evento") val fechaEvento: String?,
+    @SerializedName("dato_anterior") val datoAnterior: String?,
+    @SerializedName("dato_nuevo") val datoNuevo: String?,
+    @SerializedName("empresa_id") val empresaId: String?
+) : Serializable
 
-// --- Movimientos ---
+data class CierreMensualDTO(
+    @SerializedName("empresa_id") val empresaId: String?,
+    @SerializedName("mes") val mes: Int?,
+    @SerializedName("anio") val anio: Int?,
+    @SerializedName("cerrado") val cerrado: Boolean?,
+    @SerializedName("fecha_cierre") val fechaCierre: String?,
+    @SerializedName("cerrado_por") val cerradoPor: String?
+) : Serializable
+
+data class KpiResumenMensualDTO(
+    @SerializedName("empresa_id") val empresaId: String?,
+    @SerializedName("periodo") val periodo: String?,
+    @SerializedName("total_ingresos") val totalIngresos: Double?,
+    @SerializedName("total_egresos") val totalEgresos: Double?,
+    @SerializedName("resultado_periodo") val resultadoPeriodo: Double?,
+    @SerializedName("ventas_netas") val ventasNetas: Double?,
+    @SerializedName("iva_debito") val ivaDebito: Double?,
+    @SerializedName("iva_credito") val ivaCredito: Double?,
+    @SerializedName("iva_por_pagar") val ivaPorPagar: Double?,
+    @SerializedName("remanente_iva") val remanenteIva: Double?
+) : Serializable
+
+data class ResumenCategoriaDTO(
+    @SerializedName("categoria_nombre") val categoriaNombre: String?,
+    @SerializedName("tipo_movimiento") val tipoMovimiento: String?,
+    @SerializedName("total") val total: Double?,
+    @SerializedName("cantidad_movimientos") val cantidadMovimientos: Int?
+) : Serializable
+
+data class ResumenMovimientoDTO(
+    @SerializedName("tipo") val tipo: String?,
+    @SerializedName("total") val total: Double?
+) : Serializable
+
+data class SaldoFormaPagoDTO(
+    @SerializedName("forma_pago") val formaPago: String?,
+    @SerializedName("saldo") val saldo: Double?
+) : Serializable
+
+data class KpisEmpresaDTO(
+    @SerializedName("saldo_financiero") val saldoFinanciero: Double?,
+    @SerializedName("saldo_contable") val saldoContable: Double?,
+    @SerializedName("diferencia") val diferencia: Double?
+) : Serializable
+
 data class MovimientoDTO(
-    val id: String,
-    val fecha: String,
-    val glosa: String,
-    val monto: Double,
-    @SerializedName("tipo_movimiento") val tipo: String, // "ingreso" o "egreso"
-    @SerializedName("categoria_nombre") val categoria: String? = null
-)
+    @SerializedName("id") val id: String?,
+    @SerializedName("fecha") val fecha: String?,
+    @SerializedName("glosa") val glosa: String?,
+    @SerializedName("monto") val monto: Double?,
+    @SerializedName("tipo_movimiento") val tipoMovimiento: String?,
+    @SerializedName("categoria_nombre") val categoriaNombre: String?,
+    @SerializedName("forma_pago") val formaPago: String?,
+    @SerializedName("monto_neto") val montoNeto: Double?,
+    @SerializedName("monto_iva") val montoIva: Double?,
+    @SerializedName("afecta_iva") val afectaIva: Boolean?,
+    @SerializedName("cuenta") val cuenta: String?,
+    @SerializedName("proveedor") val proveedor: String?,
+    @SerializedName("cliente") val cliente: String?,
+    @SerializedName("documento_hash") val documentoHash: String?
+) : Serializable
 
-data class ResumenMensualDTO(
-    @SerializedName("empresa_id") val empresaId: String,
-    val periodo: String,
-    @SerializedName("total_ingresos") val totalIngresos: Double,
-    @SerializedName("total_gastos") val totalGastos: Double,
-    val saldo: Double
-)
+data class CreateEmpresaRequest(
+    @SerializedName("razon_social") val razonSocial: String?,
+    @SerializedName("rut_empresa") val rutEmpresa: String?,
+    @SerializedName("giro") val giro: String?,
+    @SerializedName("tipo_empresa") val tipoEmpresa: String?,
+    @SerializedName("fecha_inicio_actividades") val fechaInicioActividades: String?,
+    @SerializedName("direccion_comercial") val direccionComercial: String?,
+    @SerializedName("comuna") val comuna: String?,
+    @SerializedName("region") val region: String?,
+    @SerializedName("correo_contacto") val correoContacto: String?,
+    @SerializedName("telefono_contacto") val telefonoContacto: String?,
+    @SerializedName("representante_legal") val representanteLegal: String?,
+    @SerializedName("regimen_tributario") val regimenTributario: String?,
+    @SerializedName("afecta_iva") val afectaIva: Boolean?
+) : Serializable
 
 data class InvitacionRequest(
-    val email: String,
-    val empresa_id: String,
-    val rol: String
-)
+    @SerializedName("email") val email: String?,
+    @SerializedName("empresa_id") val empresaId: String?,
+    @SerializedName("rol") val rol: String?
+) : Serializable
+
+data class EmpresaRolDTO(
+    @SerializedName("empresa_id") val empresaId: String?,
+    @SerializedName("empresa_nombre") val empresaNombre: String?,
+    @SerializedName("rol") val rol: String?
+) : Serializable

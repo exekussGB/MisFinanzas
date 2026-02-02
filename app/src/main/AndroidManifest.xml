@@ -29,6 +29,23 @@
         <activity android:name=".CrearEmpresaActivity" android:exported="false" />
         <activity android:name=".EmpresaFormActivity" android:exported="false" />
         <activity android:name=".EmpresaDetalleActivity" android:exported="false" />
+        <activity android:name=".CierreMensualActivity" android:exported="false" />
+        <activity android:name=".ReportesActivity" android:exported="false" />
+        <activity android:name=".MovimientosListActivity" android:exported="false" />
+        <activity android:name=".MovimientoDetalleActivity" android:exported="false" />
+        <activity android:name=".ResumenContableActivity" android:exported="false" />
+        <activity android:name=".AuditoriaActivity" android:exported="false" />
+        <activity android:name=".AuditoriaDetalleActivity" android:exported="false" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

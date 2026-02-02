@@ -1,5 +1,6 @@
 package com.analistainacap.misfinanzas
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,13 +32,20 @@ class MovimientosAdapter(private val movimientos: List<MovimientoDTO>) :
         holder.tvFecha.text = mov.fecha
 
         val format = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
-        holder.tvMonto.text = format.format(mov.monto)
+        holder.tvMonto.text = format.format(mov.monto ?: 0.0)
 
-        // Color según el tipo: ingreso (verde) o egreso (rojo)
-        if (mov.tipo.lowercase() == "ingreso") {
+        // Sincronizado con DTO: tipoMovimiento (snake_case en Supabase)
+        val tipo = mov.tipoMovimiento?.lowercase() ?: "egreso"
+        if (tipo == "ingreso") {
             holder.tvMonto.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.success))
         } else {
             holder.tvMonto.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.error))
+        }
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, MovimientoDetalleActivity::class.java)
+            intent.putExtra("EXTRA_MOVIMIENTO_ID", mov.id)
+            holder.itemView.context.startActivity(intent)
         }
     }
 

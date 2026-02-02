@@ -12,7 +12,7 @@ import retrofit2.Response
 
 /**
  * Actividad para crear o editar una empresa.
- * La lógica de permisos (403 Forbidden) es manejada directamente por el backend de Supabase.
+ * Sincronizada con contrato unificado @QueryMap (Bloque B1).
  */
 class EmpresaFormActivity : AppCompatActivity() {
 
@@ -24,7 +24,6 @@ class EmpresaFormActivity : AppCompatActivity() {
         binding = ActivityEmpresaFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Intentamos obtener la empresa si venimos de "Editar"
         empresaExistente = intent.getSerializableExtra("EXTRA_EMPRESA") as? EmpresaDTO
 
         if (empresaExistente != null) {
@@ -84,10 +83,12 @@ class EmpresaFormActivity : AppCompatActivity() {
 
         val api = RetrofitClient.getApi(this)
         
-        val call = if (empresaExistente == null) {
+        val call: Call<Void> = if (empresaExistente == null) {
             api.crearEmpresa(empresa)
         } else {
-            api.editarEmpresa("eq.${empresaExistente!!.id}", empresa)
+            // Sincronizado con contrato B1 (@QueryMap)
+            val filters = mapOf("id" to "eq.${empresaExistente!!.id}")
+            api.editarEmpresa(filters, empresa)
         }
 
         binding.btnGuardar.isEnabled = false

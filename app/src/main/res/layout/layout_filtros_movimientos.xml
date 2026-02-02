@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@drawable/rounded_card"
+        android:backgroundTint="@color/white">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filtros Avanzados"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- FILTRO TIPO -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Movimiento"
+            android:textSize="12sp"
+            android:textColor="#888888"/>
+        <Spinner
+            android:id="@+id/spinnerTipo"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- FILTRO CATEGORÍA (C5.7) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Categoría"
+            android:textSize="12sp"
+            android:textColor="#888888"/>
+        <Spinner
+            android:id="@+id/spinnerCategoria"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- FILTRO CUENTA (C5.7) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cuenta Contable"
+            android:textSize="12sp"
+            android:textColor="#888888"/>
+        <Spinner
+            android:id="@+id/spinnerCuenta"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- FILTRO FORMA DE PAGO (C5.7) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Forma de Pago"
+            android:textSize="12sp"
+            android:textColor="#888888"/>
+        <Spinner
+            android:id="@+id/spinnerFormaPago"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- FILTRO PERIODO -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Período (Mes/Año)"
+            android:textSize="12sp"
+            android:textColor="#888888"/>
+        <TextView
+            android:id="@+id/tvFiltroPeriodo"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Seleccionar..."
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- IVA -->
+        <CheckBox
+            android:id="@+id/cbAfectaIva"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Solo movimientos con IVA"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- BOTONES -->
+        <Button
+            android:id="@+id/btnAplicarFiltros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aplicar Filtros"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btnLimpiarFiltros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Limpiar Filtros"
+            style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+    </LinearLayout>
+</ScrollView>
