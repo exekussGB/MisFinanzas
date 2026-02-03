@@ -27,6 +27,19 @@ data class EmpresaDTO(
     @SerializedName("activa") val activa: Boolean? = true
 ) : Serializable
 
+data class CreateEmpresaRequest(
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("razon_social") val razonSocial: String,
+    @SerializedName("rut_empresa") val rutEmpresa: String,
+    @SerializedName("giro") val giro: String,
+    @SerializedName("tipo_empresa") val tipoEmpresa: String,
+    @SerializedName("fecha_inicio_actividades") val fechaInicioActividades: String,
+    @SerializedName("direccion_comercial") val direccionComercial: String,
+    @SerializedName("correo_contacto") val correoContacto: String,
+    @SerializedName("telefono_contacto") val telefonoContacto: String,
+    @SerializedName("afecta_iva") val afectaIva: Boolean
+) : Serializable
+
 data class AuditoriaDTO(
     @SerializedName("id") val id: String?,
     @SerializedName("tabla_nombre") val tablaNombre: String?,
@@ -98,20 +111,6 @@ data class MovimientoDTO(
     @SerializedName("proveedor") val proveedor: String?,
     @SerializedName("cliente") val cliente: String?,
     @SerializedName("documento_hash") val documentoHash: String?
-) : Serializable
-
-data class CreateEmpresaRequest(
-    @SerializedName("razon_social") val razonSocial: String?,
-    @SerializedName("rut_empresa") val rutEmpresa: String?,
-    @SerializedName("giro") val giro: String?,
-    @SerializedName("tipo_empresa") val tipoEmpresa: String?,
-    @SerializedName("fecha_inicio_actividades") val fechaInicioActividades: String?,
-    @SerializedName("direccion_comercial") val direccionComercial: String?,
-    @SerializedName("correo_contacto") val correoContacto: String?,
-    @SerializedName("telefono_contacto") val telefonoContacto: String?,
-    @SerializedName("representante_legal") val representanteLegal: String?,
-    @SerializedName("regimen_tributario") val regimenTributario: String?,
-    @SerializedName("afecta_iva") val afectaIva: Boolean?
 ) : Serializable
 
 data class InvitacionRequest(
