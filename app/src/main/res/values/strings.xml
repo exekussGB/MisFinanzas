@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MisFinanzas</string>
+    <string-array name="opciones_si_no">
+        <item>Seleccione</item>
+        <item>Sí</item>
+        <item>No</item>
+    </string-array>
 </resources>

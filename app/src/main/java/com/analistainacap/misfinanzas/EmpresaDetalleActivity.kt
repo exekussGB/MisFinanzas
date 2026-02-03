@@ -16,8 +16,6 @@ class EmpresaDetalleActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEmpresaDetalleBinding
     private var empresa: EmpresaDTO? = null
-
-    // Clave para SharedPreferences (persistencia de sesión)
     private val KEY_EMPRESA_ID_PREFS = "empresa_id_activa"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,18 +32,14 @@ class EmpresaDetalleActivity : AppCompatActivity() {
 
         mostrarDatos()
 
-        // IR AL DASHBOARD FINANCIERO (C1)
         binding.btnVerDashboard.setOnClickListener {
             if (empresa?.id != null) {
-                // 1. Guardar en SharedPreferences para persistencia global
                 val prefs = getSharedPreferences("auth", Context.MODE_PRIVATE)
                 prefs.edit()
                     .putString(KEY_EMPRESA_ID_PREFS, empresa?.id)
                     .putString("empresa_nombre", empresa?.razonSocial)
                     .apply()
 
-                // 2. Envío EXPLÍCITO por Intent (Requerimiento C8/C9)
-                // Usando la clave consistente "empresa_id"
                 val intent = Intent(this, MainActivity::class.java)
                 intent.putExtra("empresa_id", empresa?.id)
                 startActivity(intent)
@@ -76,10 +70,8 @@ class EmpresaDetalleActivity : AppCompatActivity() {
         val detalles = StringBuilder()
         detalles.append("Giro: ${empresa?.giro}\n\n")
         detalles.append("Tipo: ${empresa?.tipoEmpresa ?: "N/A"}\n\n")
-        detalles.append("Inicio Actividades: ${empresa?.fechaInicio ?: "N/A"}\n\n")
+        detalles.append("Inicio Actividades: ${empresa?.fechaInicioActividades ?: "N/A"}\n\n")
         detalles.append("Dirección: ${empresa?.direccionComercial ?: "N/A"}\n\n")
-        detalles.append("Comuna: ${empresa?.comuna ?: "N/A"}\n\n")
-        detalles.append("Región: ${empresa?.region ?: "N/A"}\n\n")
         detalles.append("Correo: ${empresa?.correoContacto ?: "N/A"}\n\n")
         detalles.append("Teléfono: ${empresa?.telefonoContacto ?: "N/A"}\n\n")
         detalles.append("Estado: ${empresa?.estadoEmpresa}")

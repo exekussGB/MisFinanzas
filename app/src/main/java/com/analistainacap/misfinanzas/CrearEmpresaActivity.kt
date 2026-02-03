@@ -2,6 +2,7 @@ package com.analistainacap.misfinanzas
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.analistainacap.misfinanzas.network.*
@@ -12,13 +13,24 @@ import retrofit2.Response
 class CrearEmpresaActivity : AppCompatActivity() {
 
     private val KEY_EMPRESA_ID = "empresa_id_activa"
+    private lateinit var spAfectaIva: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crear_empresa)
 
+        spAfectaIva = findViewById(R.id.spAfectaIva)
         val btnCrear = findViewById<Button>(R.id.btnCrearEmpresa)
         val btnVolver = findViewById<Button>(R.id.btnVolverEmpresas)
+
+        // Configurar Spinner (Bloque 4.1)
+        val adapterSiNo = ArrayAdapter.createFromResource(
+            this,
+            R.array.opciones_si_no,
+            android.R.layout.simple_spinner_item
+        )
+        adapterSiNo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spAfectaIva.adapter = adapterSiNo
 
         btnCrear.setOnClickListener {
             ejecutarCreacion()
@@ -36,13 +48,17 @@ class CrearEmpresaActivity : AppCompatActivity() {
         val tipo = findViewById<EditText>(R.id.etTipoEmpresa).text.toString().trim()
         val fecha = findViewById<EditText>(R.id.etFechaInicio).text.toString().trim()
         val direccion = findViewById<EditText>(R.id.etDireccion).text.toString().trim()
-        val comuna = findViewById<EditText>(R.id.etComuna).text.toString().trim()
-        val region = findViewById<EditText>(R.id.etRegion).text.toString().trim()
         val correo = findViewById<EditText>(R.id.etCorreo).text.toString().trim()
         val telefono = findViewById<EditText>(R.id.etTelefono).text.toString().trim()
         val representante = findViewById<EditText>(R.id.etRepresentante).text.toString().trim()
         val regimen = findViewById<EditText>(R.id.etRegimen).text.toString().trim()
-        val afectaIva = findViewById<CheckBox>(R.id.cbAfectaIva).isChecked
+        
+        // Obtener valor booleano REAL del Spinner
+        val afectaIvaSeleccion = when (spAfectaIva.selectedItem.toString()) {
+            "Sí" -> true
+            "No" -> false
+            else -> false // Valor por defecto si no selecciona
+        }
 
         if (razonSocial.isEmpty() || rut.isEmpty() || giro.isEmpty()) {
             Toast.makeText(this, "Completa Razón Social, RUT y Giro", Toast.LENGTH_SHORT).show()
@@ -56,13 +72,11 @@ class CrearEmpresaActivity : AppCompatActivity() {
             tipoEmpresa = tipo,
             fechaInicioActividades = if (fecha.isEmpty()) "2000-01-01" else fecha,
             direccionComercial = direccion,
-            comuna = comuna,
-            region = region,
             correoContacto = correo,
             telefonoContacto = telefono,
             representanteLegal = representante,
             regimenTributario = regimen,
-            afectaIva = afectaIva
+            afectaIva = afectaIvaSeleccion
         )
 
         RetrofitClient.getApi(this).crearEmpresaRpc(request)
@@ -77,6 +91,10 @@ class CrearEmpresaActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     } else {
+                        if (!response.isSuccessful) {
+                            val errorBody = response.errorBody()?.string()
+                            Log.e("SUPABASE_ERROR", errorBody ?: "Error sin detalle")
+                        }
                         Toast.makeText(this@CrearEmpresaActivity, "Error ${response.code()}", Toast.LENGTH_LONG).show()
                     }
                 }

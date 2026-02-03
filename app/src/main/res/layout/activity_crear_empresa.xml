@@ -56,18 +56,6 @@
             android:hint="Dirección" />
 
         <EditText
-            android:id="@+id/etComuna"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Comuna" />
-
-        <EditText
-            android:id="@+id/etRegion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Región" />
-
-        <EditText
             android:id="@+id/etCorreo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,11 +81,18 @@
             android:layout_height="wrap_content"
             android:hint="Régimen Tributario" />
 
-        <CheckBox
-            android:id="@+id/cbAfectaIva"
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Afecta a IVA" />
+            android:text="Afecta a IVA"
+            android:layout_marginTop="8dp"
+            android:textSize="12sp" />
+
+        <Spinner
+            android:id="@+id/spAfectaIva"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
 
         <Button
             android:id="@+id/btnCrearEmpresa"

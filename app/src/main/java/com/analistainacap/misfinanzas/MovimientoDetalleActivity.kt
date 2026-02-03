@@ -88,29 +88,43 @@ class MovimientoDetalleActivity : AppCompatActivity() {
 
     private fun renderFicha(mov: MovimientoDTO) {
         val formatClp = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
-        
-        binding.tvDetalleGlosa.text = mov.glosa
-        binding.tvDetalleMonto.text = formatClp.format(mov.monto)
-        
-        // Color por tipo
-        val color = if (mov.tipo.lowercase() == "ingreso") R.color.success else R.color.error
+
+        binding.tvDetalleGlosa.text = mov.glosa ?: "Sin descripción"
+        binding.tvDetalleMonto.text = formatClp.format(mov.monto ?: 0.0)
+
+        val color = if (mov.tipoMovimiento?.lowercase() == "ingreso") {
+            R.color.success
+        } else {
+            R.color.error
+        }
         binding.tvDetalleMonto.setTextColor(getColor(color))
 
-        // IVA Logic sincronizada con DTO (C13.7)
         if (mov.afectaIva == true) {
             binding.rowNeto.visibility = View.VISIBLE
             binding.rowIva.visibility = View.VISIBLE
-            binding.tvDetalleMontoNeto.text = mov.neto?.let { formatClp.format(it) } ?: "$0"
-            binding.tvDetalleMontoIva.text = mov.iva?.let { formatClp.format(it) } ?: "$0"
+            binding.tvDetalleMontoNeto.text =
+                formatClp.format(mov.montoNeto ?: 0.0)
+            binding.tvDetalleMontoIva.text =
+                formatClp.format(mov.montoIva ?: 0.0)
         } else {
             binding.rowNeto.visibility = View.GONE
             binding.rowIva.visibility = View.GONE
         }
 
-        binding.tvDetalleFecha.text = formatFecha(mov.fecha)
-        binding.tvDetalleCategoria.text = mov.categoria ?: "N/A"
-        binding.tvDetalleFormaPago.text = mov.formaPago ?: "N/A"
-        binding.tvDetalleTipo.text = mov.tipo.replaceFirstChar { it.uppercase() }
+        // FIX nullable fecha
+        binding.tvDetalleFecha.text =
+            mov.fecha?.let { formatFecha(it) } ?: "Sin fecha"
+
+        binding.tvDetalleCategoria.text =
+            mov.categoriaNombre ?: "Sin categoría"
+
+        binding.tvDetalleFormaPago.text =
+            mov.formaPago ?: "No especificado"
+
+        binding.tvDetalleTipo.text =
+            mov.tipoMovimiento
+                ?.replaceFirstChar { it.uppercase() }
+                ?: "N/A"
     }
 
     private fun formatFecha(fechaRaw: String): String {

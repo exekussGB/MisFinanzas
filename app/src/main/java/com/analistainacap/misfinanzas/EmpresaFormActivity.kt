@@ -49,10 +49,8 @@ class EmpresaFormActivity : AppCompatActivity() {
         binding.etRut.setText(e.rutEmpresa)
         binding.etGiro.setText(e.giro)
         binding.etTipoEmpresa.setText(e.tipoEmpresa)
-        binding.etFechaInicio.setText(e.fechaInicio)
+        binding.etFechaInicio.setText(e.fechaInicioActividades)
         binding.etDireccion.setText(e.direccionComercial)
-        binding.etComuna.setText(e.comuna)
-        binding.etRegion.setText(e.region)
         binding.etCorreo.setText(e.correoContacto)
         binding.etTelefono.setText(e.telefonoContacto)
     }
@@ -73,12 +71,12 @@ class EmpresaFormActivity : AppCompatActivity() {
             rutEmpresa = rut,
             giro = giro,
             tipoEmpresa = binding.etTipoEmpresa.text.toString().trim(),
-            fechaInicio = binding.etFechaInicio.text.toString().trim(),
+            fechaInicioActividades = binding.etFechaInicio.text.toString().trim(),
             direccionComercial = binding.etDireccion.text.toString().trim(),
-            comuna = binding.etComuna.text.toString().trim(),
-            region = binding.etRegion.text.toString().trim(),
             correoContacto = binding.etCorreo.text.toString().trim(),
-            telefonoContacto = binding.etTelefono.text.toString().trim()
+            telefonoContacto = binding.etTelefono.text.toString().trim(),
+            estadoEmpresa = "activa",
+            rol = "administrador"
         )
 
         val api = RetrofitClient.getApi(this)

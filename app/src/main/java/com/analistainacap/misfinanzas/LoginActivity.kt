@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
                         loginBtn.text = "Ingresar"
 
                         if (response.isSuccessful && response.body() != null) {
-                            saveSession(response.body()!!.access_token)
+                            saveSession(response.body()!!.accessToken ?: "")
                             startActivity(Intent(this@LoginActivity, EmpresasActivity::class.java))
                             finish()
                         } else {
