@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 
 /**
  * Gestor de Sesión y Permisos (C8).
- * Centraliza el acceso al rol del usuario y empresa activa.
+ * Centraliza el acceso al rol del usuario, id de usuario y empresa activa.
  */
 class SessionManager(context: Context) {
 
@@ -13,6 +13,7 @@ class SessionManager(context: Context) {
 
     companion object {
         const val KEY_TOKEN = "token"
+        const val KEY_USER_ID = "user_id"
         const val KEY_USER_ROL = "user_rol"
         const val KEY_EMPRESA_ID = "empresa_id_activa"
         
@@ -27,9 +28,15 @@ class SessionManager(context: Context) {
         prefs.edit().putString(KEY_TOKEN, token).apply()
     }
 
+    fun saveUserId(userId: String) {
+        prefs.edit().putString(KEY_USER_ID, userId).apply()
+    }
+
     fun saveRol(rol: String) {
         prefs.edit().putString(KEY_USER_ROL, rol.lowercase()).apply()
     }
+
+    fun getUserId(): String = prefs.getString(KEY_USER_ID, "") ?: ""
 
     fun getRol(): String = prefs.getString(KEY_USER_ROL, ROLE_USUARIO) ?: ROLE_USUARIO
 

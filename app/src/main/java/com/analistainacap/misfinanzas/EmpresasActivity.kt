@@ -2,6 +2,7 @@ package com.analistainacap.misfinanzas
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -13,6 +14,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+/**
+ * Listado de Empresas (C1).
+ * Implementa PASO A6: Select Seguro y Control de Estados.
+ */
 class EmpresasActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEmpresasBinding
@@ -24,13 +29,11 @@ class EmpresasActivity : AppCompatActivity() {
         
         loadEmpresas()
 
-        // Botón "Registrar Nueva Empresa"
         binding.btnCrearEmpresa.setOnClickListener {
             val intent = Intent(this, EmpresaFormActivity::class.java)
             startActivityForResult(intent, 100)
         }
 
-        // Otros botones existentes
         binding.btnTengoCodigo.setOnClickListener {
             startActivity(Intent(this, AceptarInvitacionActivity::class.java))
         }
@@ -40,40 +43,55 @@ class EmpresasActivity : AppCompatActivity() {
         }
     }
 
+    private fun loading(show: Boolean) {
+        binding.pbLoading.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
     private fun loadEmpresas() {
-        binding.pbLoading.visibility = View.VISIBLE
+        // 5️⃣ Guardrail de sesión
+        val token = getSharedPreferences("auth", MODE_PRIVATE).getString("token", null)
+        if (token == null) {
+            forceLogout()
+            return
+        }
+
+        loading(true)
         binding.containerEmpresas.removeAllViews()
 
-        // Consumimos la vista segura de empresas del usuario
         RetrofitClient.getApi(this).getEmpresas().enqueue(object : Callback<List<EmpresaDTO>> {
-            override fun onResponse(
-                call: Call<List<EmpresaDTO>>,
-                response: Response<List<EmpresaDTO>>
-            ) {
-                binding.pbLoading.visibility = View.GONE
-                if (response.isSuccessful) {
-                    val empresas = response.body() ?: emptyList()
-                    renderEmpresas(empresas)
-                } else if (response.code() == 401) {
-                    forceLogout()
-                } else {
-                    showError("Error al cargar lista: ${response.code()}")
+            override fun onResponse(call: Call<List<EmpresaDTO>>, response: Response<List<EmpresaDTO>>) {
+                // 2️⃣ El loading SIEMPRE se apaga
+                loading(false)
+
+                if (!response.isSuccessful) {
+                    // 1️⃣ Control de Error
+                    val errorDetail = response.errorBody()?.string() ?: "Error sin detalle"
+                    Log.e("SupabaseSelect", "HTTP ${response.code()}: $errorDetail")
+                    showError("Error al cargar la lista de empresas")
+                    return
                 }
+
+                val empresas = response.body()
+                if (empresas.isNullOrEmpty()) {
+                    // 4️⃣ Empty State REAL
+                    Toast.makeText(this@EmpresasActivity, "No tienes empresas vinculadas", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                renderEmpresas(empresas)
             }
 
             override fun onFailure(call: Call<List<EmpresaDTO>>, t: Throwable) {
-                binding.pbLoading.visibility = View.GONE
+                // 2️⃣ El loading SIEMPRE se apaga
+                loading(false)
+                // 3️⃣ onFailure NO es opcional
+                Log.e("NetworkFail", t.message ?: "Error de red")
                 showError("Sin conexión a internet")
             }
         })
     }
 
     private fun renderEmpresas(empresas: List<EmpresaDTO>) {
-        if (empresas.isEmpty()) {
-            Toast.makeText(this, "No tienes empresas vinculadas", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         empresas.forEach { empresa ->
             val button = Button(this).apply {
                 text = "${empresa.razonSocial}\n(RUT: ${empresa.rutEmpresa})"
@@ -89,7 +107,6 @@ class EmpresasActivity : AppCompatActivity() {
                 layoutParams = params
 
                 setOnClickListener {
-                    // Al pulsar, vamos al DETALLE para ver opciones de Dashboard, Editar o Borrar
                     val intent = Intent(this@EmpresasActivity, EmpresaDetalleActivity::class.java)
                     intent.putExtra("EXTRA_EMPRESA", empresa)
                     startActivity(intent)
@@ -102,7 +119,7 @@ class EmpresasActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            loadEmpresas() // Recargar lista si hubo cambios
+            loadEmpresas()
         }
     }
 
