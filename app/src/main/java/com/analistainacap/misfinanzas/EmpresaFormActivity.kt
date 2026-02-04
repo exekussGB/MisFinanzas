@@ -4,16 +4,13 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.analistainacap.misfinanzas.databinding.ActivityEmpresaFormBinding
+import com.analistainacap.misfinanzas.network.CreateEmpresaRequest
 import com.analistainacap.misfinanzas.network.EmpresaDTO
 import com.analistainacap.misfinanzas.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-/**
- * Actividad para crear o editar una empresa.
- * Sincronizada con contrato unificado @QueryMap (Bloque B1).
- */
 class EmpresaFormActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEmpresaFormBinding
@@ -21,6 +18,7 @@ class EmpresaFormActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Corrección de Binding: Usar el layout del formulario
         binding = ActivityEmpresaFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -49,6 +47,7 @@ class EmpresaFormActivity : AppCompatActivity() {
         binding.etRut.setText(e.rutEmpresa)
         binding.etGiro.setText(e.giro)
         binding.etTipoEmpresa.setText(e.tipoEmpresa)
+        // Sincronizado con Models.kt
         binding.etFechaInicio.setText(e.fechaInicioActividades)
         binding.etDireccion.setText(e.direccionComercial)
         binding.etCorreo.setText(e.correoContacto)
@@ -65,55 +64,65 @@ class EmpresaFormActivity : AppCompatActivity() {
             return
         }
 
-        val empresa = EmpresaDTO(
-            id = empresaExistente?.id,
-            razonSocial = razon,
-            rutEmpresa = rut,
-            giro = giro,
-            tipoEmpresa = binding.etTipoEmpresa.text.toString().trim(),
-            fechaInicioActividades = binding.etFechaInicio.text.toString().trim(),
-            direccionComercial = binding.etDireccion.text.toString().trim(),
-            correoContacto = binding.etCorreo.text.toString().trim(),
-            telefonoContacto = binding.etTelefono.text.toString().trim(),
-            estadoEmpresa = "activa",
-            rol = "administrador"
-        )
-
         val api = RetrofitClient.getApi(this)
+        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
+        val userId = prefs.getString("user_id", "") ?: ""
         
-        val call: Call<Void> = if (empresaExistente == null) {
-            api.crearEmpresa(empresa)
+        val call: Call<List<EmpresaDTO>> = if (empresaExistente == null) {
+            // Flujo Creación: Crear Request con ownerId obligatorio
+            val request = CreateEmpresaRequest(
+                nombre = razon,
+                razonSocial = razon,
+                rutEmpresa = rut,
+                ownerId = userId,
+                giro = giro,
+                tipoEmpresa = binding.etTipoEmpresa.text.toString().trim(),
+                fechaInicioActividades = binding.etFechaInicio.text.toString().trim(),
+                direccionComercial = binding.etDireccion.text.toString().trim(),
+                correoContacto = binding.etCorreo.text.toString().trim(),
+                telefonoContacto = binding.etTelefono.text.toString().trim()
+            )
+            api.crearEmpresa(request)
         } else {
-            // Sincronizado con contrato B1 (@QueryMap)
+            // Flujo Edición: Filtro Map y Body EmpresaDTO
             val filters = mapOf("id" to "eq.${empresaExistente!!.id}")
-            api.editarEmpresa(filters, empresa)
+            val empresaUpdate = EmpresaDTO(
+                id = empresaExistente!!.id,
+                razonSocial = razon,
+                rutEmpresa = rut,
+                giro = giro,
+                tipoEmpresa = binding.etTipoEmpresa.text.toString().trim(),
+                fechaInicioActividades = binding.etFechaInicio.text.toString().trim(),
+                direccionComercial = binding.etDireccion.text.toString().trim(),
+                correoContacto = binding.etCorreo.text.toString().trim(),
+                telefonoContacto = binding.etTelefono.text.toString().trim(),
+                estadoEmpresa = empresaExistente!!.estadoEmpresa,
+                rol = empresaExistente!!.rol,
+                activa = empresaExistente!!.activa
+            )
+            api.editarEmpresa(filters, empresaUpdate)
         }
 
         binding.btnGuardar.isEnabled = false
         binding.btnGuardar.text = "Procesando..."
 
-        call.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        call.enqueue(object : Callback<List<EmpresaDTO>> {
+            override fun onResponse(call: Call<List<EmpresaDTO>>, response: Response<List<EmpresaDTO>>) {
                 binding.btnGuardar.isEnabled = true
-                
                 if (response.isSuccessful) {
                     Toast.makeText(this@EmpresaFormActivity, "Empresa guardada", Toast.LENGTH_SHORT).show()
                     setResult(RESULT_OK)
                     finish()
                 } else {
-                    when (response.code()) {
-                        403 -> Toast.makeText(this@EmpresaFormActivity, "Error 403: No tienes permisos para esta acción", Toast.LENGTH_LONG).show()
-                        401 -> Toast.makeText(this@EmpresaFormActivity, "Sesión expirada", Toast.LENGTH_SHORT).show()
-                        else -> Toast.makeText(this@EmpresaFormActivity, "Error del servidor: ${response.code()}", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(this@EmpresaFormActivity, "Error ${response.code()}", Toast.LENGTH_SHORT).show()
                     binding.btnGuardar.text = "Reintentar"
                 }
             }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
+            override fun onFailure(call: Call<List<EmpresaDTO>>, t: Throwable) {
                 binding.btnGuardar.isEnabled = true
                 binding.btnGuardar.text = "Guardar Empresa"
-                Toast.makeText(this@EmpresaFormActivity, "Fallo de red: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@EmpresaFormActivity, "Error de red", Toast.LENGTH_SHORT).show()
             }
         })
     }

@@ -64,17 +64,17 @@ class EmpresaDetalleActivity : AppCompatActivity() {
     }
 
     private fun mostrarDatos() {
-        binding.tvRazonSocial.text = empresa?.razonSocial
-        binding.tvRut.text = "RUT: ${empresa?.rutEmpresa}"
+        binding.tvRazonSocial.text = empresa?.razonSocial ?: "N/A"
+        binding.tvRut.text = "RUT: ${empresa?.rutEmpresa ?: "N/A"}"
         
         val detalles = StringBuilder()
-        detalles.append("Giro: ${empresa?.giro}\n\n")
+        detalles.append("Giro: ${empresa?.giro ?: "N/A"}\n\n")
         detalles.append("Tipo: ${empresa?.tipoEmpresa ?: "N/A"}\n\n")
         detalles.append("Inicio Actividades: ${empresa?.fechaInicioActividades ?: "N/A"}\n\n")
         detalles.append("Dirección: ${empresa?.direccionComercial ?: "N/A"}\n\n")
         detalles.append("Correo: ${empresa?.correoContacto ?: "N/A"}\n\n")
         detalles.append("Teléfono: ${empresa?.telefonoContacto ?: "N/A"}\n\n")
-        detalles.append("Estado: ${empresa?.estadoEmpresa}")
+        detalles.append("Estado: ${empresa?.estadoEmpresa ?: "N/A"}")
 
         binding.tvDetalles.text = detalles.toString()
     }
@@ -82,12 +82,18 @@ class EmpresaDetalleActivity : AppCompatActivity() {
     private fun eliminarLogico() {
         if (empresa?.id == null) return
 
-        val update = empresa!!.copy(activa = false, estadoEmpresa = "eliminada")
+        // Tarea 2: Crear objeto EmpresaDTO actualizado
+        val empresaActualizada = empresa!!.copy(
+            activa = false,
+            estadoEmpresa = "eliminada"
+        )
+        
+        // Tarea 1: Filtro como Map<String, String>
         val filters = mapOf("id" to "eq.${empresa!!.id}")
         
-        RetrofitClient.getApi(this).editarEmpresa(filters, update)
-            .enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        RetrofitClient.getApi(this).editarEmpresa(filters, empresaActualizada)
+            .enqueue(object : Callback<List<EmpresaDTO>> {
+                override fun onResponse(call: Call<List<EmpresaDTO>>, response: Response<List<EmpresaDTO>>) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@EmpresaDetalleActivity, "Empresa eliminada", Toast.LENGTH_SHORT).show()
                         finish()
@@ -96,7 +102,7 @@ class EmpresaDetalleActivity : AppCompatActivity() {
                     }
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<List<EmpresaDTO>>, t: Throwable) {
                     Toast.makeText(this@EmpresaDetalleActivity, "Error de red", Toast.LENGTH_SHORT).show()
                 }
             })

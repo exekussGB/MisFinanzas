@@ -31,13 +31,16 @@ data class CreateEmpresaRequest(
     @SerializedName("nombre") val nombre: String,
     @SerializedName("razon_social") val razonSocial: String,
     @SerializedName("rut_empresa") val rutEmpresa: String,
-    @SerializedName("giro") val giro: String,
-    @SerializedName("tipo_empresa") val tipoEmpresa: String,
-    @SerializedName("fecha_inicio_actividades") val fechaInicioActividades: String,
-    @SerializedName("direccion_comercial") val direccionComercial: String,
-    @SerializedName("correo_contacto") val correoContacto: String,
-    @SerializedName("telefono_contacto") val telefonoContacto: String,
-    @SerializedName("afecta_iva") val afectaIva: Boolean
+    @SerializedName("owner_id") val ownerId: String,
+    @SerializedName("giro") val giro: String? = null,
+    @SerializedName("tipo_empresa") val tipoEmpresa: String? = null,
+    @SerializedName("fecha_inicio_actividades") val fechaInicioActividades: String? = null,
+    @SerializedName("direccion_comercial") val direccionComercial: String? = null,
+    @SerializedName("correo_contacto") val correoContacto: String? = null,
+    @SerializedName("telefono_contacto") val telefonoContacto: String? = null,
+    @SerializedName("representante_legal") val representanteLegal: String? = null,
+    @SerializedName("regimen_tributario") val regimenTributario: String? = null,
+    @SerializedName("afecta_iva") val afectaIva: Boolean = false
 ) : Serializable
 
 data class AuditoriaDTO(

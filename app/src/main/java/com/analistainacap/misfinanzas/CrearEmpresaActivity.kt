@@ -23,7 +23,6 @@ class CrearEmpresaActivity : AppCompatActivity() {
         val btnCrear = findViewById<Button>(R.id.btnCrearEmpresa)
         val btnVolver = findViewById<Button>(R.id.btnVolverEmpresas)
 
-        // Configurar Spinner (Bloque 4.1)
         val adapterSiNo = ArrayAdapter.createFromResource(
             this,
             R.array.opciones_si_no,
@@ -42,6 +41,14 @@ class CrearEmpresaActivity : AppCompatActivity() {
     }
 
     private fun ejecutarCreacion() {
+        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
+        val token = prefs.getString("token", null)
+        val userId = prefs.getString("user_id", "") ?: ""
+
+        if (token == null) {
+            Log.e("AuthCheck", "ERROR: No hay Token JWT. Supabase te rechazará.")
+        }
+
         val razonSocial = findViewById<EditText>(R.id.etRazonSocial).text.toString().trim()
         val rut = findViewById<EditText>(R.id.etRut).text.toString().trim()
         val giro = findViewById<EditText>(R.id.etGiro).text.toString().trim()
@@ -53,21 +60,22 @@ class CrearEmpresaActivity : AppCompatActivity() {
         val representante = findViewById<EditText>(R.id.etRepresentante).text.toString().trim()
         val regimen = findViewById<EditText>(R.id.etRegimen).text.toString().trim()
         
-        // Obtener valor booleano REAL del Spinner
         val afectaIvaSeleccion = when (spAfectaIva.selectedItem.toString()) {
             "Sí" -> true
             "No" -> false
-            else -> false // Valor por defecto si no selecciona
+            else -> false
         }
 
-        if (razonSocial.isEmpty() || rut.isEmpty() || giro.isEmpty()) {
-            Toast.makeText(this, "Completa Razón Social, RUT y Giro", Toast.LENGTH_SHORT).show()
+        if (razonSocial.isEmpty() || rut.isEmpty() || giro.isEmpty() || userId.isEmpty()) {
+            Toast.makeText(this, "Completa Razón Social, RUT, Giro y asegúrate de estar logueado", Toast.LENGTH_SHORT).show()
             return
         }
 
         val request = CreateEmpresaRequest(
+            nombre = razonSocial,
             razonSocial = razonSocial,
             rutEmpresa = rut,
+            ownerId = userId,
             giro = giro,
             tipoEmpresa = tipo,
             fechaInicioActividades = if (fecha.isEmpty()) "2000-01-01" else fecha,
@@ -78,6 +86,8 @@ class CrearEmpresaActivity : AppCompatActivity() {
             regimenTributario = regimen,
             afectaIva = afectaIvaSeleccion
         )
+
+        Log.d("SupabaseDebug", "PAYLOAD: ${com.google.gson.Gson().toJson(request)}")
 
         RetrofitClient.getApi(this).crearEmpresaRpc(request)
             .enqueue(object : Callback<String> {
@@ -93,7 +103,7 @@ class CrearEmpresaActivity : AppCompatActivity() {
                     } else {
                         if (!response.isSuccessful) {
                             val errorBody = response.errorBody()?.string()
-                            Log.e("SUPABASE_ERROR", errorBody ?: "Error sin detalle")
+                            Log.e("SUPABASE_ERROR", "HTTP ${response.code()}: $errorBody")
                         }
                         Toast.makeText(this@CrearEmpresaActivity, "Error ${response.code()}", Toast.LENGTH_LONG).show()
                     }

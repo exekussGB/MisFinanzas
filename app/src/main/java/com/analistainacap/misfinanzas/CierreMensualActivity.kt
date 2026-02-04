@@ -106,20 +106,17 @@ class CierreMensualActivity : AppCompatActivity() {
     }
 
     private fun ejecutarProcesoCierre() {
-        // C11.12 - Proceso de Cierre con Registro
+        // C11.12 - Proceso de Cierre con Registro RPC
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Confirmar Cierre")
         builder.setMessage("¿Desea cerrar el período $anioSel-$mesSel? Esta acción bloqueará ediciones.")
         builder.setPositiveButton("Cerrar") { _, _ ->
-            val cierreReq = CierreMensualDTO(
-                empresaId = empresaIdActiva,
-                mes = mesSel,
-                anio = anioSel,
-                cerrado = true,
-                fechaCierre = null, // Generado por BD
-                cerradoPor = null   // Identificado por JWT
+            val params = mapOf(
+                "p_empresa_id" to empresaIdActiva,
+                "p_mes" to mesSel,
+                "p_anio" to anioSel
             )
-            RetrofitClient.getApi(this).ejecutarCierre(cierreReq).enqueue(object : Callback<Void> {
+            RetrofitClient.getApi(this).ejecutarCierre(params).enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@CierreMensualActivity, "Período cerrado exitosamente", Toast.LENGTH_SHORT).show()
@@ -134,7 +131,7 @@ class CierreMensualActivity : AppCompatActivity() {
     }
 
     private fun solicitarReapertura() {
-        // C11.11 y C11.12 - Reapertura con Motivo
+        // C11.11 y C11.12 - Reapertura con Motivo RPC
         val input = EditText(this)
         input.hint = "Indique motivo de reapertura"
         
@@ -155,10 +152,10 @@ class CierreMensualActivity : AppCompatActivity() {
 
     private fun ejecutarReapertura(motivo: String) {
         val params = mapOf(
-            "emp_id" to empresaIdActiva,
-            "mes_num" to mesSel,
-            "anio_num" to anioSel,
-            "motivo_txt" to motivo
+            "p_empresa_id" to empresaIdActiva,
+            "p_mes" to mesSel,
+            "p_anio" to anioSel,
+            "p_motivo" to motivo
         )
         RetrofitClient.getApi(this).reabrirPeriodo(params).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
