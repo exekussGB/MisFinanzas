@@ -1,64 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvFormTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Datos de la Empresa"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
+
+            <EditText android:id="@+id/etRazonSocial" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Razón Social" />
+            <EditText android:id="@+id/etRut" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="RUT Empresa" />
+            <EditText android:id="@+id/etGiro" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Giro" />
+            <EditText android:id="@+id/etTipoEmpresa" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Tipo (SpA, EIRL, etc)" />
+            <EditText android:id="@+id/etFechaInicio" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Inicio Actividades (YYYY-MM-DD)" android:inputType="date" />
+            <EditText android:id="@+id/etDireccion" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Dirección Comercial" />
+            <EditText android:id="@+id/etCorreo" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Correo Contacto" android:inputType="textEmailAddress" />
+            <EditText android:id="@+id/etTelefono" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Teléfono Contacto" android:inputType="phone" />
+            <EditText android:id="@+id/etRepresentante" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Representante Legal" />
+
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Estado de la Empresa" android:layout_marginTop="12dp" android:textSize="12sp" android:textColor="#666666"/>
+            <Spinner android:id="@+id/spEstado" android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Régimen Tributario" android:layout_marginTop="12dp" android:textSize="12sp" android:textColor="#666666"/>
+            <Spinner android:id="@+id/spRegimen" android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="¿Afecta a IVA?" android:layout_marginTop="12dp" android:textSize="12sp" android:textColor="#666666"/>
+            <Spinner android:id="@+id/spAfectaIva" android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="¿Retiene Honorarios?" android:layout_marginTop="12dp" android:textSize="12sp" android:textColor="#666666"/>
+            <Spinner android:id="@+id/spRetieneHonorarios" android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btnGuardar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Guardar Empresa"
+                android:layout_marginTop="24dp"
+                android:minHeight="80dp"
+                android:textSize="18sp"
+                android:textAllCaps="false"/>
+
+            <Button
+                android:id="@+id/btnCancelar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cancelar"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_marginTop="8dp"
+                android:minHeight="80dp"
+                android:textSize="18sp"
+                android:textAllCaps="false"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/pbFormulario"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
-            android:id="@+id/tvFormTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Datos de la Empresa"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
-
-        <EditText android:id="@+id/etRazonSocial" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Razón Social" />
-        <EditText android:id="@+id/etRut" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="RUT Empresa" />
-        <EditText android:id="@+id/etGiro" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Giro" />
-        <EditText android:id="@+id/etTipoEmpresa" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Tipo (SpA, EIRL, etc)" />
-        <EditText android:id="@+id/etFechaInicio" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Inicio Actividades (YYYY-MM-DD)" android:inputType="date" />
-        <EditText android:id="@+id/etDireccion" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Dirección Comercial" />
-        <EditText android:id="@+id/etCorreo" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Correo Contacto" android:inputType="textEmailAddress" />
-        <EditText android:id="@+id/etTelefono" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Teléfono Contacto" android:inputType="phone" />
-        <EditText android:id="@+id/etRepresentante" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Representante Legal" />
-
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Estado de la Empresa" android:layout_marginTop="12dp" android:textSize="12sp" android:textColor="#666666"/>
-        <Spinner android:id="@+id/spEstado" android:layout_width="match_parent" android:layout_height="wrap_content" />
-
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Régimen Tributario" android:layout_marginTop="12dp" android:textSize="12sp" android:textColor="#666666"/>
-        <Spinner android:id="@+id/spRegimen" android:layout_width="match_parent" android:layout_height="wrap_content" />
-
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="¿Afecta a IVA?" android:layout_marginTop="12dp" android:textSize="12sp" android:textColor="#666666"/>
-        <Spinner android:id="@+id/spAfectaIva" android:layout_width="match_parent" android:layout_height="wrap_content" />
-
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="¿Retiene Honorarios?" android:layout_marginTop="12dp" android:textSize="12sp" android:textColor="#666666"/>
-        <Spinner android:id="@+id/spRetieneHonorarios" android:layout_width="match_parent" android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btnGuardar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Guardar Empresa"
-            android:layout_marginTop="24dp"
-            android:minHeight="80dp"
-            android:textSize="18sp"
-            android:textAllCaps="false"/>
-
-        <Button
-            android:id="@+id/btnCancelar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cancelar"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_marginTop="8dp"
-            android:minHeight="80dp"
-            android:textSize="18sp"
-            android:textAllCaps="false"/>
-    </LinearLayout>
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.analistainacap.misfinanzas.network
 
 import android.content.Context
+import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -8,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 /**
  * Cliente Retrofit Senior para Supabase.
- * Implementa inyección dinámica de Token JWT y Logging de red.
+ * PASO 3: Interceptor Correcto (La sesión se recupera dinámicamente).
  */
 object RetrofitClient {
     private var apiService: SupabaseApiService? = null
@@ -22,14 +23,18 @@ object RetrofitClient {
             val client = OkHttpClient.Builder()
                 .addInterceptor(logging)
                 .addInterceptor { chain ->
-                    // Recuperar token actualizado en cada petición
-                    val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
-                    val token = prefs.getString("token", "")
+                    // 1️⃣ Obtención de sesión oficial del cliente (Paso 3)
+                    val session = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+                    val token = session.getString("token", "")
+                    val userId = session.getString("user_id", "")
+
+                    Log.e("DEBUG_SESSION_CLIENT", "USER_ID = $userId | TOKEN PRESENTE = ${!token.isNullOrEmpty()}")
 
                     val requestBuilder = chain.request().newBuilder()
                         .addHeader("apikey", SupabaseConfig.ANON_KEY)
                         .addHeader("Content-Type", "application/json")
 
+                    // Solo inyectar si la sesión es válida
                     if (!token.isNullOrEmpty()) {
                         requestBuilder.addHeader("Authorization", "Bearer $token")
                     }
@@ -48,10 +53,6 @@ object RetrofitClient {
         return apiService!!
     }
 
-    /**
-     * Limpia la instancia de la API al cerrar sesión.
-     * Obliga a recrear el cliente con el nuevo contexto de seguridad.
-     */
     fun clearInstance() {
         apiService = null
     }

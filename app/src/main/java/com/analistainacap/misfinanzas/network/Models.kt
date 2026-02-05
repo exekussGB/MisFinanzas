@@ -12,6 +12,14 @@ data class LoginResponse(
     @SerializedName("access_token") val accessToken: String?
 ) : Serializable
 
+data class UUIDResponse(
+    @SerializedName("id") val id: String
+) : Serializable
+
+data class EmpresaUsuarioRolDTO(
+    @SerializedName("rol") val rol: String?
+) : Serializable
+
 data class EmpresaDTO(
     @SerializedName("id") val id: String?,
     @SerializedName("razon_social") val razonSocial: String?,
@@ -23,24 +31,36 @@ data class EmpresaDTO(
     @SerializedName("correo_contacto") val correoContacto: String?,
     @SerializedName("telefono_contacto") val telefonoContacto: String?,
     @SerializedName("estado_empresa") val estadoEmpresa: String?,
-    @SerializedName("rol") val rol: String?,
-    @SerializedName("activa") val activa: Boolean? = true
+    @SerializedName("rol") var rol: String?,
+    @SerializedName("activa") val activa: Boolean? = true,
+    @SerializedName("empresa_usuarios") val empresaUsuarios: List<EmpresaUsuarioRolDTO>? = null
 ) : Serializable
 
+/**
+ * 🔧 BLOQUE 2 — UpdateEmpresaRequest (Models.kt)
+ * DTO exclusivo para edición (PATCH).
+ */
+data class UpdateEmpresaRequest(
+    val razon_social: String,
+    val rut_empresa: String,
+    val giro: String?,
+    val tipo_empresa: String?,
+    val direccion_comercial: String?,
+    val correo_contacto: String?,
+    val telefono_contacto: String?
+) : Serializable
+
+/**
+ * 2️⃣ DTO PARA CREAR EMPRESA (RPC)
+ */
 data class CreateEmpresaRequest(
-    @SerializedName("nombre") val nombre: String,
-    @SerializedName("razon_social") val razonSocial: String,
-    @SerializedName("rut_empresa") val rutEmpresa: String,
-    @SerializedName("owner_id") val ownerId: String,
-    @SerializedName("giro") val giro: String? = null,
-    @SerializedName("tipo_empresa") val tipoEmpresa: String? = null,
-    @SerializedName("fecha_inicio_actividades") val fechaInicioActividades: String? = null,
-    @SerializedName("direccion_comercial") val direccionComercial: String? = null,
-    @SerializedName("correo_contacto") val correoContacto: String? = null,
-    @SerializedName("telefono_contacto") val telefonoContacto: String? = null,
-    @SerializedName("representante_legal") val representanteLegal: String? = null,
-    @SerializedName("regimen_tributario") val regimenTributario: String? = null,
-    @SerializedName("afecta_iva") val afectaIva: Boolean = false
+    @SerializedName("p_razon_social") val razon_social: String,
+    @SerializedName("p_rut_empresa") val rut_empresa: String,
+    @SerializedName("p_giro") val giro: String?,
+    @SerializedName("p_tipo_empresa") val tipo_empresa: String?,
+    @SerializedName("p_direccion_comercial") val direccion_comercial: String?,
+    @SerializedName("p_correo_contacto") val correo_contacto: String?,
+    @SerializedName("p_telefono_contacto") val telefono_contacto: String?
 ) : Serializable
 
 data class AuditoriaDTO(

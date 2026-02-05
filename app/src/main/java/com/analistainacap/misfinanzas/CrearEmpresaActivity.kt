@@ -72,44 +72,38 @@ class CrearEmpresaActivity : AppCompatActivity() {
         }
 
         val request = CreateEmpresaRequest(
-            nombre = razonSocial,
-            razonSocial = razonSocial,
-            rutEmpresa = rut,
-            ownerId = userId,
-            giro = giro,
-            tipoEmpresa = tipo,
-            fechaInicioActividades = if (fecha.isEmpty()) "2000-01-01" else fecha,
-            direccionComercial = direccion,
-            correoContacto = correo,
-            telefonoContacto = telefono,
-            representanteLegal = representante,
-            regimenTributario = regimen,
-            afectaIva = afectaIvaSeleccion
+            razon_social = razonSocial,
+            rut_empresa = rut,
+            giro = giro.ifEmpty { null },
+            tipo_empresa = tipo.ifEmpty { null },
+            direccion_comercial = direccion.ifEmpty { null },
+            correo_contacto = correo.ifEmpty { null },
+            telefono_contacto = telefono.ifEmpty { null }
         )
 
         Log.d("SupabaseDebug", "PAYLOAD: ${com.google.gson.Gson().toJson(request)}")
 
         RetrofitClient.getApi(this).crearEmpresaRpc(request)
-            .enqueue(object : Callback<String> {
-                override fun onResponse(call: Call<String>, response: Response<String>) {
+            .enqueue(object : Callback<UUIDResponse> {
+                override fun onResponse(call: Call<UUIDResponse>, response: Response<UUIDResponse>) {
                     if (response.isSuccessful && response.body() != null) {
-                        val nuevoId = response.body()!!
+                        // Capturamos el UUID generado (Paso Crítico)
+                        val nuevoId = response.body()!!.id
                         saveEmpresaId(nuevoId, razonSocial)
+                        
                         Toast.makeText(this@CrearEmpresaActivity, "Empresa creada correctamente", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@CrearEmpresaActivity, MainActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
                         finish()
                     } else {
-                        if (!response.isSuccessful) {
-                            val errorBody = response.errorBody()?.string()
-                            Log.e("SUPABASE_ERROR", "HTTP ${response.code()}: $errorBody")
-                        }
+                        val errorBody = response.errorBody()?.string()
+                        Log.e("SUPABASE_ERROR", "HTTP ${response.code()}: $errorBody")
                         Toast.makeText(this@CrearEmpresaActivity, "Error ${response.code()}", Toast.LENGTH_LONG).show()
                     }
                 }
 
-                override fun onFailure(call: Call<String>, t: Throwable) {
+                override fun onFailure(call: Call<UUIDResponse>, t: Throwable) {
                     Toast.makeText(this@CrearEmpresaActivity, "Fallo de conexión", Toast.LENGTH_SHORT).show()
                 }
             })

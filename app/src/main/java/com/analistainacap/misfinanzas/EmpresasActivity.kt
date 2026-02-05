@@ -10,13 +10,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.analistainacap.misfinanzas.databinding.ActivityEmpresasBinding
 import com.analistainacap.misfinanzas.network.*
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 /**
  * Listado de Empresas (C1).
- * Implementa PASO A6: Select Seguro y Control de Estados.
  */
 class EmpresasActivity : AppCompatActivity() {
 
@@ -30,6 +30,7 @@ class EmpresasActivity : AppCompatActivity() {
         loadEmpresas()
 
         binding.btnCrearEmpresa.setOnClickListener {
+            Log.d("BTN_CREAR_EMPRESA", "Click crear empresa - Iniciando Formulario")
             val intent = Intent(this, EmpresaFormActivity::class.java)
             startActivityForResult(intent, 100)
         }
@@ -48,7 +49,6 @@ class EmpresasActivity : AppCompatActivity() {
     }
 
     private fun loadEmpresas() {
-        // 5️⃣ Guardrail de sesión
         val token = getSharedPreferences("auth", MODE_PRIVATE).getString("token", null)
         if (token == null) {
             forceLogout()
@@ -60,20 +60,26 @@ class EmpresasActivity : AppCompatActivity() {
 
         RetrofitClient.getApi(this).getEmpresas().enqueue(object : Callback<List<EmpresaDTO>> {
             override fun onResponse(call: Call<List<EmpresaDTO>>, response: Response<List<EmpresaDTO>>) {
-                // 2️⃣ El loading SIEMPRE se apaga
                 loading(false)
 
                 if (!response.isSuccessful) {
-                    // 1️⃣ Control de Error
                     val errorDetail = response.errorBody()?.string() ?: "Error sin detalle"
                     Log.e("SupabaseSelect", "HTTP ${response.code()}: $errorDetail")
                     showError("Error al cargar la lista de empresas")
                     return
                 }
 
-                val empresas = response.body()
-                if (empresas.isNullOrEmpty()) {
-                    // 4️⃣ Empty State REAL
+                val empresas = response.body() ?: emptyList()
+                
+                // --- Sincronización de Rol (Bloque Crítico) ---
+                empresas.forEach { empresa ->
+                    // Extraemos el rol del JOIN anidado devuelto por PostgREST
+                    val rolExtraido = empresa.empresaUsuarios?.firstOrNull()?.rol
+                    empresa.rol = rolExtraido
+                    Log.d("DEBUG_JSON", "Empresa: ${empresa.razonSocial}, Rol: $rolExtraido")
+                }
+
+                if (empresas.isEmpty()) {
                     Toast.makeText(this@EmpresasActivity, "No tienes empresas vinculadas", Toast.LENGTH_SHORT).show()
                     return
                 }
@@ -82,9 +88,7 @@ class EmpresasActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<EmpresaDTO>>, t: Throwable) {
-                // 2️⃣ El loading SIEMPRE se apaga
                 loading(false)
-                // 3️⃣ onFailure NO es opcional
                 Log.e("NetworkFail", t.message ?: "Error de red")
                 showError("Sin conexión a internet")
             }

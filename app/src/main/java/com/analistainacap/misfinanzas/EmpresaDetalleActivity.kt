@@ -3,6 +3,7 @@ package com.analistainacap.misfinanzas
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,9 @@ class EmpresaDetalleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityEmpresaDetalleBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // A0.1 — Confirmación técnica de carga de la Activity
+        Log.e("DEBUG_ACTIVITY", "EmpresaDetailActivity CARGADA")
 
         sessionManager = SessionManager(this)
         empresa = intent.getSerializableExtra("EXTRA_EMPRESA") as? EmpresaDTO
@@ -67,8 +71,22 @@ class EmpresaDetalleActivity : AppCompatActivity() {
     }
 
     private fun setupPermissionsUI() {
-        // --- UI Defensiva (Bloque B3) ---
-        binding.btnEditar.visibility = if (sessionManager.puedeGestionarEmpresa()) View.VISIBLE else View.GONE
+        // Verificación rápida (Paso A)
+        Log.d("EMPRESA_ROLE", "Empresa ${empresa?.id} rol=${empresa?.rol}")
+
+        // --- Log de depuración de ROL (Nueva prueba) ---
+        Log.e("DEBUG_ROL", "ROL = ${empresa?.rol}")
+
+        // --- Habilitar edición según rol (Paso A) ---
+        if (empresa?.rol?.uppercase() == "OWNER") {
+            binding.btnEditar.isEnabled = true
+            binding.btnEditar.visibility = View.VISIBLE
+        } else {
+            binding.btnEditar.isEnabled = false
+            binding.btnEditar.visibility = View.GONE
+        }
+
+        // Bloque B3 original para eliminar (solo owner puede borrar)
         binding.btnEliminar.visibility = if (sessionManager.puedeEliminarEmpresa()) View.VISIBLE else View.GONE
     }
 
@@ -88,25 +106,51 @@ class EmpresaDetalleActivity : AppCompatActivity() {
         binding.tvDetalles.text = detalles.toString()
     }
 
+    /**
+     * ✅ FUNCIÓN eliminarLogico() (CORREGIDA Y COMPILABLE)
+     * BLOQUE 3 — Implementación definitiva del PATCH para actualización de estado.
+     */
     private fun eliminarLogico() {
-        if (!sessionManager.puedeEliminarEmpresa()) return
+        val e = empresa ?: return
+        val id = e.id ?: return
 
-        val updateMap = mapOf(
-            "activa" to false,
-            "estado_empresa" to "eliminada"
+        val request = UpdateEmpresaRequest(
+            razon_social = e.razonSocial ?: return,
+            rut_empresa = e.rutEmpresa ?: return,
+            giro = e.giro,
+            tipo_empresa = e.tipoEmpresa,
+            direccion_comercial = e.direccionComercial,
+            correo_contacto = e.correoContacto,
+            telefono_contacto = e.telefonoContacto
         )
-        val filters = mapOf("id" to "eq.${empresa!!.id}")
-        
-        RetrofitClient.getApi(this).editarEmpresa(filters, updateMap)
-            .enqueue(object : Callback<List<EmpresaDTO>> {
-                override fun onResponse(call: Call<List<EmpresaDTO>>, response: Response<List<EmpresaDTO>>) {
+
+        RetrofitClient.getApi(this)
+            .editarEmpresa("eq.$id", request)
+            .enqueue(object : Callback<Void> {
+
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@EmpresaDetalleActivity, "Empresa eliminada", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@EmpresaDetalleActivity,
+                            "Empresa actualizada correctamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         finish()
+                    } else {
+                        Toast.makeText(
+                            this@EmpresaDetalleActivity,
+                            "Error al editar empresa (${response.code()})",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
-                override fun onFailure(call: Call<List<EmpresaDTO>>, t: Throwable) {
-                    Toast.makeText(this@EmpresaDetalleActivity, "Error de red", Toast.LENGTH_SHORT).show()
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Toast.makeText(
+                        this@EmpresaDetalleActivity,
+                        "Error de red",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             })
     }

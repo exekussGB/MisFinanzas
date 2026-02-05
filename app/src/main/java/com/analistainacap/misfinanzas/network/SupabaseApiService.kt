@@ -5,7 +5,6 @@ import retrofit2.http.*
 
 /**
  * Interfaz de red senior para Supabase (PostgREST).
- * Contrato REST estricto para operaciones de escritura (Paso A3).
  */
 interface SupabaseApiService {
 
@@ -14,38 +13,25 @@ interface SupabaseApiService {
 
     // --- EMPRESAS ---
     
-    /**
-     * 🔹 LISTADO DE EMPRESAS (TABLA BASE)
-     * Consume directamente la tabla empresas con select explícito.
-     */
-    @GET("rest/v1/empresas?select=id,razon_social,rut_empresa,giro,tipo_empresa,fecha_inicio_actividades,direccion_comercial,correo_contacto,telefono_contacto,estado_empresa")
+    @GET("rest/v1/empresas?select=*")
     fun getEmpresas(): Call<List<EmpresaDTO>>
 
-    /**
-     * 🔹 MIS ROLES (OBLIGATORIO)
-     * Obtiene el rol y estado activo del usuario por cada empresa vinculada.
-     */
     @GET("rest/v1/empresa_usuarios?select=empresa_id,rol,activo")
     fun getMisRoles(): Call<List<EmpresaRolDTO>>
 
     /**
-     * 🔹 CREAR EMPRESA (RPC OBLIGATORIO)
+     * ✅ ANDROID — ENDPOINT CORRECTO
      */
     @POST("rest/v1/rpc/crear_empresa")
-    fun crearEmpresaRpc(@Body request: CreateEmpresaRequest): Call<String>
+    fun crearEmpresaRpc(
+        @Body request: CreateEmpresaRequest
+    ): Call<UUIDResponse>
 
-    /**
-     * 🔹 EDITAR EMPRESA (PATCH)
-     */
-    @Headers(
-        "Content-Type: application/json",
-        "Prefer: return=representation"
-    )
     @PATCH("rest/v1/empresas")
     fun editarEmpresa(
-        @QueryMap filtros: Map<String, String>,
-        @Body campos: Map<String, @JvmSuppressWildcards Any?>
-    ): Call<List<EmpresaDTO>>
+        @Query("id") idFilter: String,
+        @Body body: UpdateEmpresaRequest
+    ): Call<Void>
 
     // --- MOVIMIENTOS ---
     
@@ -55,14 +41,12 @@ interface SupabaseApiService {
         @Header("Range") range: String? = null
     ): Call<List<MovimientoDTO>>
 
-    // --- AUDITORÍA (C7) ---
+    // --- AUDITORÍA ---
     
     @GET("rest/v1/auditoria_contable")
-    fun getAuditoria(
-        @QueryMap filters: Map<String, String>
-    ): Call<List<AuditoriaDTO>>
+    fun getAuditoria(@QueryMap filters: Map<String, String>): Call<List<AuditoriaDTO>>
 
-    // --- DASHBOARD Y RESÚMENES ---
+    // --- KPIs ---
 
     @GET("rest/v1/vista_kpi_resumen_mensual")
     fun getKpiResumenMensual(@QueryMap filters: Map<String, String>): Call<List<KpiResumenMensualDTO>>
@@ -78,13 +62,9 @@ interface SupabaseApiService {
     @POST("rest/v1/rpc/reabrir_periodo")
     fun reabrirPeriodo(@QueryMap params: Map<String, String>): Call<Void>
 
-    // --- CATÁLOGOS ---
-    
     @GET("rest/v1/categorias")
     fun getCategorias(@QueryMap filters: Map<String, String> = mapOf("select" to "nombre")): Call<List<Map<String, String>>>
 
-    // --- OTROS RPC ---
-    
     @POST("rest/v1/rpc/aceptar_invitacion")
     fun aceptarInvitacion(@Body body: Map<String, String>): Call<Void>
 }
