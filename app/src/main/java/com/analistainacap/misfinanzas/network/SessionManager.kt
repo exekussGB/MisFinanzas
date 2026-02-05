@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 /**
  * Gestor de Sesión y Permisos (C8).
  * Centraliza el acceso al rol del usuario, id de usuario y empresa activa.
+ * Refactorizado: Los permisos se basan en la jerarquía funcional, no en strings rígidos.
  */
 class SessionManager(context: Context) {
 
@@ -17,9 +18,8 @@ class SessionManager(context: Context) {
         const val KEY_USER_ROL = "user_rol"
         const val KEY_EMPRESA_ID = "empresa_id_activa"
         
-        // Roles Definidos (C8.2)
+        // Roles Funcionales
         const val ROLE_OWNER = "owner"
-        const val ROLE_ADMIN = "administrador"
         const val ROLE_CONTADOR = "contador"
         const val ROLE_USUARIO = "usuario"
     }
@@ -42,25 +42,24 @@ class SessionManager(context: Context) {
 
     fun getEmpresaId(): String = prefs.getString(KEY_EMPRESA_ID, "") ?: ""
 
-    // --- Lógica de Permisos (C8.5) ---
+    // --- Lógica de Permisos Refactorizada (Quitar dependencias de Admin) ---
 
     fun puedeExportar(): Boolean {
         val rol = getRol()
-        return rol == ROLE_OWNER || rol == ROLE_ADMIN || rol == ROLE_CONTADOR
+        return rol == ROLE_OWNER || rol == ROLE_CONTADOR
     }
 
     fun puedeVerAuditoria(): Boolean {
         val rol = getRol()
-        return rol == ROLE_OWNER || rol == ROLE_ADMIN || rol == ROLE_CONTADOR
+        return rol == ROLE_OWNER || rol == ROLE_CONTADOR
     }
 
     fun puedeGestionarEmpresa(): Boolean {
-        val rol = getRol()
-        return rol == ROLE_OWNER || rol == ROLE_ADMIN
+        return getRol() == ROLE_OWNER
     }
 
     fun puedeEliminarEmpresa(): Boolean {
-        return getRol() == ROLE_OWNER // Solo el owner puede borrar (C8.5)
+        return getRol() == ROLE_OWNER
     }
 
     fun logout() {

@@ -60,7 +60,8 @@ class ResumenContableRepository(private val apiService: SupabaseApiService) {
 
         Log.d(TAG, "G1 - Request IVA: $filters")
 
-        apiService.getIvaResumenMensual(filters)
+        // Sincronizado con SupabaseApiService: IVA y KPIs comparten el DTO consolidado (A3)
+        apiService.getKpiResumenMensual(filters)
             .enqueue(object : Callback<List<KpiResumenMensualDTO>> {
                 override fun onResponse(
                     call: Call<List<KpiResumenMensualDTO>>,

@@ -14,7 +14,6 @@ import retrofit2.Response
 
 /**
  * Actividad para crear o editar una empresa.
- * Implementa PASO A7: Sincronización estricta de DTOs y limpieza de referencias.
  */
 class EmpresaFormActivity : AppCompatActivity() {
 
@@ -78,17 +77,14 @@ class EmpresaFormActivity : AppCompatActivity() {
         binding.etDireccion.setText(e.direccionComercial)
         binding.etCorreo.setText(e.correoContacto)
         binding.etTelefono.setText(e.telefonoContacto)
-        
-        // 1️⃣ Paso A7: Se eliminan accesos a campos que no están en EmpresaDTO (lectura)
 
         when (e.estadoEmpresa?.lowercase()) {
             "activa" -> binding.spEstado.setSelection(0)
             "suspendida" -> binding.spEstado.setSelection(1)
             "cerrada" -> binding.spEstado.setSelection(2)
         }
-        binding.spAfectaIva.setSelection(if (e.activa == true) 1 else 2)
         
-        // 2️⃣ Paso A7: Inicialización segura de Spinners de escritura
+        binding.spAfectaIva.setSelection(if (e.activa == true) 1 else 2)
         binding.spRegimen.setSelection(0)
         binding.spRetieneHonorarios.setSelection(0)
     }
@@ -108,10 +104,6 @@ class EmpresaFormActivity : AppCompatActivity() {
         }
         if (rut.isBlank()) {
             binding.etRut.error = "RUT obligatorio"
-            return
-        }
-        if (userId.isBlank()) {
-            Toast.makeText(this, "Sesión no válida", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -134,8 +126,7 @@ class EmpresaFormActivity : AppCompatActivity() {
 
         val api = RetrofitClient.getApi(this)
         
-        val call: Call<List<EmpresaDTO>> = if (empresaExistente == null) {
-            // 3️⃣ Paso A7: Construcción correcta del request (Escritura)
+        if (empresaExistente == null) {
             val request = CreateEmpresaRequest(
                 nombre = razon,
                 razonSocial = razon,
@@ -151,47 +142,48 @@ class EmpresaFormActivity : AppCompatActivity() {
                 regimenTributario = regimenSeleccionado,
                 afectaIva = afectaIvaBool
             )
-            Log.d("SupabaseJSON", "POST Payload: ${Gson().toJson(request)}")
-            api.crearEmpresa(request)
+            api.crearEmpresaRpc(request).enqueue(object : Callback<String> {
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+                    isSubmitting = false
+                    binding.btnGuardar.isEnabled = true
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@EmpresaFormActivity, "Empresa creada", Toast.LENGTH_SHORT).show()
+                        setResult(RESULT_OK)
+                        finish()
+                    }
+                }
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    isSubmitting = false
+                    binding.btnGuardar.isEnabled = true
+                }
+            })
         } else {
             val filters = mapOf("id" to "eq.${empresaExistente!!.id}")
             val updateFields = mutableMapOf<String, Any?>(
                 "razon_social" to razon,
                 "rut_empresa" to rut,
                 "estado_empresa" to estadoActual,
-                "afecta_iva" to afectaIvaBool,
+                "activa" to afectaIvaBool,
                 "regimen_tributario" to regimenSeleccionado,
                 "giro" to clean(binding.etGiro.text?.toString()),
                 "tipo_empresa" to clean(binding.etTipoEmpresa.text?.toString()),
-                "direccion_comercial" to clean(binding.etDireccion.text?.toString()),
-                "representante_legal" to clean(binding.etRepresentante.text?.toString()),
-                "retiene_honorarios" to (binding.spRetieneHonorarios.selectedItemPosition == 1)
+                "direccion_comercial" to clean(binding.etDireccion.text?.toString())
             )
-            Log.d("SupabaseJSON", "PATCH Payload: ${Gson().toJson(updateFields)}")
-            api.editarEmpresa(filters, updateFields)
-        }
-
-        call.enqueue(object : Callback<List<EmpresaDTO>> {
-            override fun onResponse(call: Call<List<EmpresaDTO>>, response: Response<List<EmpresaDTO>>) {
-                isSubmitting = false
-                binding.btnGuardar.isEnabled = true
-                if (response.isSuccessful) {
-                    Toast.makeText(this@EmpresaFormActivity, "Operación exitosa", Toast.LENGTH_SHORT).show()
-                    finish()
-                } else {
-                    val errorDetail = response.errorBody()?.string() ?: "Sin detalle"
-                    Log.e("SupabaseError", "HTTP ${response.code()}: $errorDetail")
-                    Toast.makeText(this@EmpresaFormActivity, "Error de validación", Toast.LENGTH_SHORT).show()
-                    binding.btnGuardar.text = "Reintentar"
+            api.editarEmpresa(filters, updateFields).enqueue(object : Callback<List<EmpresaDTO>> {
+                override fun onResponse(call: Call<List<EmpresaDTO>>, response: Response<List<EmpresaDTO>>) {
+                    isSubmitting = false
+                    binding.btnGuardar.isEnabled = true
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@EmpresaFormActivity, "Empresa actualizada", Toast.LENGTH_SHORT).show()
+                        setResult(RESULT_OK)
+                        finish()
+                    }
                 }
-            }
-            override fun onFailure(call: Call<List<EmpresaDTO>>, t: Throwable) {
-                isSubmitting = false
-                binding.btnGuardar.isEnabled = true
-                binding.btnGuardar.text = "Guardar Empresa"
-                Log.e("NetworkError", "Fallo de red: ${t.message}")
-                Toast.makeText(this@EmpresaFormActivity, "Error de red", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onFailure(call: Call<List<EmpresaDTO>>, t: Throwable) {
+                    isSubmitting = false
+                    binding.btnGuardar.isEnabled = true
+                }
+            })
+        }
     }
 }

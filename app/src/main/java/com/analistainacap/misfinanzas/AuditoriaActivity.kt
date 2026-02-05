@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.analistainacap.misfinanzas.databinding.ActivityAuditoriaBinding
 import com.analistainacap.misfinanzas.network.*
 import retrofit2.Call
@@ -14,103 +13,66 @@ import retrofit2.Callback
 import retrofit2.Response
 
 /**
- * Auditoría Contable (C7) - MODO LECTURA.
- * Sincronizado con contrato @QueryMap.
+ * Pantalla de Auditoría Contable (C7).
+ * Muestra el registro de cambios (INSERT, UPDATE, DELETE) de la empresa.
+ * Implementa Corrección Técnica Post-Refactor (Opción B: Limpieza).
  */
 class AuditoriaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuditoriaBinding
-    private val KEY_EMPRESA_ID = "empresa_id_activa"
-    private val TAG = "AuditoriaContable"
-    
-    private var currentPage = 0
-    private val pageSize = 50
-    private var isLastPage = false
-    private var isLoading = false
-    private val auditLogs = mutableListOf<AuditoriaDTO>()
-    private lateinit var adapter: AuditoriaAdapter
-    private var empresaIdActiva = ""
+    private lateinit var sessionManager: SessionManager
+    private var empresaId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuditoriaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-        empresaIdActiva = prefs.getString(KEY_EMPRESA_ID, "") ?: ""
-        val rol = prefs.getString("user_rol", "usuario") ?: "usuario"
+        sessionManager = SessionManager(this)
+        empresaId = sessionManager.getEmpresaId()
 
-        if (empresaIdActiva.isEmpty()) {
-            Toast.makeText(this, "Debe seleccionar una empresa activa", Toast.LENGTH_SHORT).show()
+        // 1️⃣ Guardrail de Permisos: Basado en rol activo en empresa (Bloque B3)
+        if (!sessionManager.puedeVerAuditoria()) {
+            Toast.makeText(this, "Acceso denegado: Se requiere rol de Contador u Owner", Toast.LENGTH_LONG).show()
             finish()
             return
         }
 
-        if (!esRolAutorizado(rol)) {
-            binding.tvEmptyAuditoria.text = "Permisos insuficientes"
-            binding.tvEmptyAuditoria.visibility = View.VISIBLE
-            binding.rvAuditoria.visibility = View.GONE
-            binding.btnVolverAuditoria.setOnClickListener { finish() }
-            return
-        }
+        setupUI()
+        loadLogs()
+    }
 
-        setupRecyclerView()
-        loadNextPage()
-
+    private fun setupUI() {
+        binding.rvAuditoria.layoutManager = LinearLayoutManager(this)
         binding.btnVolverAuditoria.setOnClickListener { finish() }
     }
 
-    private fun esRolAutorizado(rol: String): Boolean {
-        return rol == "admin" || rol == "owner" || rol == "contador" || rol == "administrador"
-    }
-
-    private fun setupRecyclerView() {
-        adapter = AuditoriaAdapter(auditLogs)
-        binding.rvAuditoria.layoutManager = LinearLayoutManager(this)
-        binding.rvAuditoria.adapter = adapter
-
-        binding.rvAuditoria.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                if (!isLoading && !isLastPage) {
-                    if (layoutManager.findLastCompletelyVisibleItemPosition() == auditLogs.size - 1) {
-                        loadNextPage()
-                    }
-                }
-            }
-        })
-    }
-
-    private fun loadNextPage() {
-        isLoading = true
+    private fun loadLogs() {
         binding.pbAuditoria.visibility = View.VISIBLE
+        
+        val filters = mutableMapOf("empresa_id" to "eq.$empresaId")
 
-        val rangeHeader = "${currentPage * pageSize}-${(currentPage + 1) * pageSize - 1}"
-        val filters = mapOf("empresa_id" to "eq.$empresaIdActiva")
-
-        RetrofitClient.getApi(this).getAuditoria(
-            filters = filters,
-            range = rangeHeader
-        ).enqueue(object : Callback<List<AuditoriaDTO>> {
-            override fun onResponse(call: Call<List<AuditoriaDTO>>, response: Response<List<AuditoriaDTO>>) {
-                isLoading = false
-                binding.pbAuditoria.visibility = View.GONE
-                if (response.isSuccessful) {
-                    val newLogs = response.body() ?: emptyList()
-                    if (newLogs.isEmpty()) {
-                        isLastPage = true
-                        if (currentPage == 0) binding.tvEmptyAuditoria.visibility = View.VISIBLE
+        RetrofitClient.getApi(this).getAuditoria(filters)
+            .enqueue(object : Callback<List<AuditoriaDTO>> {
+                override fun onResponse(call: Call<List<AuditoriaDTO>>, response: Response<List<AuditoriaDTO>>) {
+                    binding.pbAuditoria.visibility = View.GONE
+                    if (response.isSuccessful) {
+                        val logs = response.body() ?: emptyList()
+                        if (logs.isEmpty()) {
+                            Toast.makeText(this@AuditoriaActivity, "No hay registros de auditoría", Toast.LENGTH_SHORT).show()
+                        }
+                        binding.rvAuditoria.adapter = AuditoriaAdapter(logs.toMutableList())
                     } else {
-                        adapter.addLogs(newLogs)
-                        currentPage++
-                        if (newLogs.size < pageSize) isLastPage = true
+                        val errorBody = response.errorBody()?.string()
+                        Log.e("AuditoriaError", "HTTP ${response.code()}: $errorBody")
                     }
                 }
-            }
-            override fun onFailure(call: Call<List<AuditoriaDTO>>, t: Throwable) {
-                isLoading = false
-                binding.pbAuditoria.visibility = View.GONE
-            }
-        })
+
+                override fun onFailure(call: Call<List<AuditoriaDTO>>, t: Throwable) {
+                    binding.pbAuditoria.visibility = View.GONE
+                    Log.e("NetworkFail", t.message ?: "Fallo conexión")
+                    Toast.makeText(this@AuditoriaActivity, "Error de red", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 }

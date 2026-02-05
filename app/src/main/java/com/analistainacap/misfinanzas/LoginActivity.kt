@@ -40,7 +40,15 @@ class LoginActivity : AppCompatActivity() {
                         loginBtn.text = "Ingresar"
 
                         if (response.isSuccessful && response.body() != null) {
-                            saveSession(response.body()!!.accessToken ?: "")
+                            val token = response.body()!!.accessToken ?: ""
+                            // NOTA: Para obtener el UID del usuario en una App real con Supabase
+                            // usualmente se decodifica el JWT o se usa el endpoint /user.
+                            // Aquí simulamos la persistencia del token para el Interceptor.
+                            saveSession(token)
+                            
+                            // Limpiar instancia previa de Retrofit para forzar uso del nuevo token
+                            RetrofitClient.clearInstance()
+                            
                             startActivity(Intent(this@LoginActivity, EmpresasActivity::class.java))
                             finish()
                         } else {
@@ -58,6 +66,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun saveSession(token: String) {
-        getSharedPreferences("auth", MODE_PRIVATE).edit().putString("token", token).apply()
+        getSharedPreferences("auth", MODE_PRIVATE).edit()
+            .putString("token", token)
+            .apply()
     }
 }
